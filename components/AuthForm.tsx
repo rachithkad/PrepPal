@@ -22,11 +22,18 @@ import FormField from "./FormField";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
-    name: type === "sign-up" ? z.string().min(3) : z.string().optional(),
-    email: z.string().email(),
-    password: z.string().min(3),
+    name: type === "sign-up" ? z.string().min(3, "Name must be at least 3 characters") : z.string().optional(),
+    email: z.string().email("Invalid email"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])/,
+        "Password must include uppercase, lowercase, number, and special character"
+      ),
   });
 };
+
 
 const AuthForm = ({ type }: { type: FormType }) => {
   const router = useRouter();
@@ -109,7 +116,15 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(
+              onSubmit,
+              (errors) => {
+                const firstError = Object.values(errors)[0];
+                if (firstError?.message) {
+                  toast.error(firstError.message);
+                }
+              }
+            )}
             className="w-full space-y-6 mt-4 form"
           >
             {!isSignIn && (
