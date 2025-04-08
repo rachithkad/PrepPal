@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 
 import { signIn, signUp } from "@/lib/actions/auth.action";
 import FormField from "./FormField";
+import PasswordField from "./PasswordInput";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -145,12 +146,12 @@ const AuthForm = ({ type }: { type: FormType }) => {
               type="email"
             />
 
-            <FormField
+            <PasswordField
               control={form.control}
               name="password"
               label="Password"
               placeholder="Enter your password"
-              type="password"
+              showStrength={!isSignIn}
             />
 
             <Button className="btn" type="submit">
