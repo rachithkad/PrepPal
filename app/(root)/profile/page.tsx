@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProgressSnapshot from "@/components/profile/ProgressSnapshot";
+import { getUserInterviewStats } from "@/lib/actions/general.action";
 
 export default async function ProfilePage() {
   const user = await getCurrentUser();
@@ -13,15 +14,13 @@ export default async function ProfilePage() {
     );
   }
 
+  const stats = await getUserInterviewStats(user.id);
+  
   return (
     <main className="min-h-screen bg-background text-foreground">
       <ProfileHeader name={user.name} email={user.email} />
-      <ProgressSnapshot
-        interviewsTaken={5}
-        averageScore={78}
-        favoriteTech="React"
-        lastActive="Apr 6, 2025"
-      />
+      
+      {stats && <ProgressSnapshot {...stats} />}
       {/* Next sections go here */}
     </main>
   );

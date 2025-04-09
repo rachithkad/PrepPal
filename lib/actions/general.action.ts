@@ -123,3 +123,52 @@ export async function getInterviewsByUserId(
     ...doc.data(),
   })) as Interview[];
 }
+
+export async function getUserInterviewStats(userId: string) {
+  const interviewsSnapshot = await db
+    .collection("interviews")
+    .where("userId", "==", userId)
+    .get();
+
+  const interviews = interviewsSnapshot.docs.map((doc) => doc.data());
+
+  if (interviews.length === 0) return null;
+
+  const feedbacksSnapshot = await db
+  .collection("feedback")
+  .where("userId", "==", userId)
+  .get();
+
+  const feedbacks = feedbacksSnapshot.docs.map((doc) => doc.data());
+
+  const validScores = feedbacks
+  .map((f) => Number(f.totalScore))
+  .filter((score) => !isNaN(score));
+  
+  const averageScore =
+  validScores.reduce((acc, curr) => acc + curr, 0) / validScores.length;
+
+
+  const techFrequency: Record<string, number> = {};
+  interviews.forEach((i) => {
+    i.techstack?.forEach((tech: string) => {
+      techFrequency[tech] = (techFrequency[tech] || 0) + 1;
+    });
+  });
+
+  const favoriteTech =
+    Object.entries(techFrequency).sort((a, b) => b[1] - a[1])[0]?.[0] || "---";
+
+    const lastActiveDate = feedbacks
+    .map((f) => new Date(f.createdAt))
+    .sort((a, b) => b.getTime() - a.getTime())[0];
+
+    const lastActive = lastActiveDate?.toISOString() || null;
+
+  return {
+    interviewsTaken: interviews.length,
+    averageScore: Math.round(averageScore) || 0,
+    favoriteTech,
+    lastActive,
+  };
+}
