@@ -57,7 +57,7 @@ export default async function ProfilePage() {
             <SkeletonBox className="h-60 w-full rounded-2xl" />
             <SkeletonBox className="h-60 w-full rounded-2xl" />
             <SkeletonBox className="h-60 w-full col-span-full md:col-span-2 rounded-2xl" />
-          </section>
+          </section>         
         </>
       )}
     </main>
