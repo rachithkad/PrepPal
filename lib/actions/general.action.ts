@@ -135,20 +135,27 @@ export async function getUserInterviewStats(userId: string) {
   if (interviews.length === 0) return null;
 
   const feedbacksSnapshot = await db
-  .collection("feedback")
-  .where("userId", "==", userId)
-  .get();
+    .collection("feedback")
+    .where("userId", "==", userId)
+    .get();
 
   const feedbacks = feedbacksSnapshot.docs.map((doc) => doc.data());
 
+  // --- Basic Stats ---
   const validScores = feedbacks
-  .map((f) => Number(f.totalScore))
-  .filter((score) => !isNaN(score));
+    .map((f) => Number(f.totalScore))
+    .filter((score) => !isNaN(score));
   
   const averageScore =
-  validScores.reduce((acc, curr) => acc + curr, 0) / validScores.length;
+    validScores.reduce((acc, curr) => acc + curr, 0) / validScores.length;
 
+  const lastActiveDate = feedbacks
+    .map((f) => new Date(f.createdAt))
+    .sort((a, b) => b.getTime() - a.getTime())[0];
 
+  const lastActive = lastActiveDate?.toISOString() || null;
+
+  // --- Tech Frequency ---
   const techFrequency: Record<string, number> = {};
   interviews.forEach((i) => {
     i.techstack?.forEach((tech: string) => {
@@ -159,16 +166,40 @@ export async function getUserInterviewStats(userId: string) {
   const favoriteTech =
     Object.entries(techFrequency).sort((a, b) => b[1] - a[1])[0]?.[0] || "---";
 
-    const lastActiveDate = feedbacks
-    .map((f) => new Date(f.createdAt))
-    .sort((a, b) => b.getTime() - a.getTime())[0];
+  // --- Line Chart: Score over Time ---
+  const scoreTimeline = feedbacks
+    .filter((f) => !isNaN(Number(f.totalScore)))
+    .map((f) => ({
+      date: new Date(f.createdAt).toISOString().split("T")[0],
+      score: Number(f.totalScore),
+    }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    const lastActive = lastActiveDate?.toISOString() || null;
+  // --- Bar Chart: Type Frequency ---
+  const typeFrequency: Record<string, number> = {};
+  interviews.forEach((i) => {
+    const type = i.type || "Unknown";
+    typeFrequency[type] = (typeFrequency[type] || 0) + 1;
+  });
+
+  const interviewTypes = Object.entries(typeFrequency).map(([type, count]) => ({
+    type,
+    count,
+  }));
+
+  // --- Donut Chart: Tech Frequency ---
+  const techDonutData = Object.entries(techFrequency).map(([tech, count]) => ({
+    tech,
+    value: count,
+  }));
 
   return {
     interviewsTaken: interviews.length,
     averageScore: Math.round(averageScore) || 0,
     favoriteTech,
     lastActive,
+    lineChartData: scoreTimeline,
+    barChartData: interviewTypes,
+    donutChartData: techDonutData,
   };
 }

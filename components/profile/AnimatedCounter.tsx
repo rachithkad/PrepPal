@@ -1,4 +1,3 @@
-// components/ui/animated-counter.tsx
 "use client";
 
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
