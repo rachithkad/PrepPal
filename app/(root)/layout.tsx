@@ -3,11 +3,13 @@ import Image from "next/image";
 import { ReactNode } from "react";
 import { redirect } from "next/navigation";
 
-import { isAuthenticated } from "@/lib/actions/auth.action";
+import { getCurrentUser, isAuthenticated } from "@/lib/actions/auth.action";
 
 const Layout = async ({ children }: { children: ReactNode }) => {
   const isUserAuthenticated = await isAuthenticated();
   if (!isUserAuthenticated) redirect("/sign-in");
+
+  const user = await getCurrentUser();
 
   return (
     <div className="root-layout">
@@ -18,7 +20,9 @@ const Layout = async ({ children }: { children: ReactNode }) => {
             <h2 className="text-primary-100">Mockhiato</h2>
           </Link>
           <Link href="/profile" className="flex items-end justify-end">
-            <Image src="/user-avatar.png" alt="PrepPal Logo" width={38} height={32} className="rounded-full"/>
+            <div className="w-20 h-20 rounded-full bg-muted text-foreground flex items-center justify-center text-3xl font-bold shadow">
+              {user?.name?.[0]?.toUpperCase() || "?"}
+            </div>
           </Link>
         </div>
       </nav>
