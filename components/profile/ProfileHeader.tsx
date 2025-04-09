@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/actions/auth.action";
 import { useRouter } from "next/navigation";
+import {  LogOut } from "lucide-react";
 
 type ProfileHeaderProps = {
   name: string;
@@ -32,7 +33,7 @@ const ProfileHeader = ({ name, email }: ProfileHeaderProps) => {
       </div>
 
       <Button onClick={handleSignOut} className="sm:mt-0 bg-destructive text-white hover:bg-destructive/90 cursor-pointer">
-        Sign Out
+        Sign Out <LogOut />
       </Button>
     </div>
   );
