@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 
 import { Form } from "@/components/ui/form";
@@ -29,12 +30,11 @@ const authFormSchema = (type: FormType) => {
       .string()
       .min(8, "Password must be at least 8 characters")
       .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])/, 
         "Password must include uppercase, lowercase, number, and special character"
       ),
   });
 };
-
 
 const AuthForm = ({ type }: { type: FormType }) => {
   const router = useRouter();
@@ -103,6 +103,22 @@ const AuthForm = ({ type }: { type: FormType }) => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    const email = form.getValues("email");
+    if (!email) {
+      toast.error("Please enter your email first.");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast.success("Password reset email sent. Check your inbox.");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to send reset email. Please try again.");
+    }
+  };
+
   const isSignIn = type === "sign-in";
 
   return (
@@ -153,6 +169,18 @@ const AuthForm = ({ type }: { type: FormType }) => {
               placeholder="Enter your password"
               showStrength={!isSignIn}
             />
+
+            {isSignIn && (
+              <p className="text-right text-sm">
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="text-user-primary hover:underline"
+                >
+                  Forgot password?
+                </button>
+              </p>
+            )}
 
             <Button className="btn" type="submit">
               {isSignIn ? "Sign In" : "Create an Account"}
