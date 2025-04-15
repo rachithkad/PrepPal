@@ -11,6 +11,7 @@ import { Form } from "@/components/ui/form";
 import FormField from "@/components/FormField";
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import { useRouter } from "next/navigation";  // Use the `useRouter` hook from `next/navigation`
+import React from "react";
 
 const GenerateInterviewForm = () => {
   const form = useForm<GenerateInterviewInput>({
@@ -25,8 +26,11 @@ const GenerateInterviewForm = () => {
     },
   });
 
+  const [loading, setLoading] = React.useState(false);  // Track loading state
   const router = useRouter();  // Get the router instance
+  
   const onSubmit = async (values: GenerateInterviewInput) => {
+    setLoading(true);  // Set loading to true when API call starts
     try {
       const user = await getCurrentUser();
       const response = await fetch("/api/vapi/generate", {
@@ -51,6 +55,8 @@ const GenerateInterviewForm = () => {
     } catch (err) {
       console.error(err);
       toast.error("Failed to generate interview");
+    } finally {
+      setLoading(false);  // Set loading to false when API call finishes (success or failure)
     }
   };
 
@@ -99,8 +105,8 @@ const GenerateInterviewForm = () => {
             placeholder="e.g., Google"
           />
 
-          <Button className="w-full btn" type="submit">
-            Generate Interview
+          <Button className="w-full btn" type="submit" disabled={loading}>
+            {loading ? "Generating..." : "Generate Interview"}
           </Button>
         </form>
       </Form>
