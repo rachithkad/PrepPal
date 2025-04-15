@@ -7,6 +7,7 @@ import DisplayTechIcons from "./DisplayTechIcons";
 
 import { cn, getRandomInterviewCover } from "@/lib/utils";
 import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
+import InterviewImage from "./InterviewImage";
 
 const InterviewCard = async ({
   interviewId,
@@ -15,7 +16,9 @@ const InterviewCard = async ({
   type,
   techstack,
   createdAt,
+  company
 }: InterviewCardProps) => {
+
   const feedback =
     userId && interviewId
       ? await getFeedbackByInterviewId({
@@ -25,7 +28,7 @@ const InterviewCard = async ({
       : null;
 
   const normalizedType = /mix/gi.test(type) ? "Mixed" : type;
-
+ 
   const badgeColor =
     {
       Behavioral: "bg-light-400",
@@ -36,7 +39,7 @@ const InterviewCard = async ({
   const formattedDate = dayjs(
     feedback?.createdAt || createdAt || Date.now()
   ).format("MMM D, YYYY");
-
+console.log("Company:", company);
   return (
     <div className="card-border w-[360px] max-sm:w-full min-h-96">
       <div className="card-interview">
@@ -51,14 +54,9 @@ const InterviewCard = async ({
             <p className="badge-text ">{normalizedType}</p>
           </div>
 
+          
           {/* Cover Image */}
-          <Image
-            src={getRandomInterviewCover()}
-            alt="cover-image"
-            width={90}
-            height={90}
-            className="rounded-full object-fit size-[90px]"
-          />
+          <InterviewImage company={company || ""}/>
 
           {/* Interview Role */}
           <h3 className="mt-5 capitalize">{role} Interview</h3>

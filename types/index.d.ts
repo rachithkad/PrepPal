@@ -14,6 +14,7 @@ interface Feedback {
 }
 
 interface Interview {
+  company: string | undefined;
   id: string;
   role: string;
   level: string;
@@ -45,6 +46,7 @@ interface InterviewCardProps {
   type: string;
   techstack: string[];
   createdAt?: string;
+  company?: string;
 }
 
 interface AgentProps {

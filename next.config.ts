@@ -7,7 +7,10 @@ const nextConfig: NextConfig = {
   },
   typescript: {
     ignoreBuildErrors: true,
-  }
+  },
+  images: {
+    domains: ['logo.clearbit.com'],
+  },
 };
 
 export default nextConfig;
