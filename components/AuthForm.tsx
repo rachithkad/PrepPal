@@ -8,6 +8,8 @@ import { auth } from "@/firebase/client";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 import {
   createUserWithEmailAndPassword,
@@ -37,6 +39,9 @@ const authFormSchema = (type: FormType) => {
 };
 
 const AuthForm = ({ type }: { type: FormType }) => {
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
 
   const formSchema = authFormSchema(type);
@@ -51,6 +56,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
+      setIsLoading(true);
       if (type === "sign-up") {
         const { name, email, password } = data;
 
@@ -182,9 +188,19 @@ const AuthForm = ({ type }: { type: FormType }) => {
               </p>
             )}
 
-            <Button className="btn" type="submit">
-              {isSignIn ? "Sign In" : "Create an Account"}
+            <Button className="btn" type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Redirecting...
+                </>
+              ) : isSignIn ? (
+                "Sign In"
+              ) : (
+                "Create an Account"
+              )}
             </Button>
+
           </form>
         </Form>
 

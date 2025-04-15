@@ -228,3 +228,14 @@ export const dummyInterviews: Interview[] = [
     createdAt: "2024-03-14T15:30:00Z",
   },
 ];
+
+export const generateInterviewSchema = z.object({
+  role: z.string().min(2, "Role is required"),
+  type: z.string().min(2, "Type is required"),
+  level: z.string().min(1, "Experience level is required"),
+  amount: z.string().min(1, "Number of questions is required"),
+  techstack: z.string().min(2, "Tech stack is required"),
+  company: z.string().optional(),
+});
+
+export type GenerateInterviewInput = z.infer<typeof generateInterviewSchema>;
