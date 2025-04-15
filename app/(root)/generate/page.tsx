@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { BrainCog, FileText, Mic } from "lucide-react";
 
@@ -13,10 +13,10 @@ const options = [
     href: "/generate/form",
   },
   {
-    title: "Via Job Description / Resume",
-    description: "Paste a job description or upload your resume to auto-generate questions.",
+    title: "Via Resume",
+    description: "Upload your resume to auto-generate questions.",
     icon: <BrainCog className="w-6 h-6 text-primary" />,
-    href: "/generate/jd-resume",
+    href: "/generate/resume",
   },
   {
     title: "Via Voice Agent",
