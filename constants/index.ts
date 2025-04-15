@@ -139,6 +139,8 @@ export const mappings = {
   "snowpack": "snowpack",
   "java": "java",
   "python": "python",
+  "fastml": "fastml",
+  "tensorflow": "tensorflow",
   "SQL": "sql",
   "kotlin": "kotlin",
   "scala": "scala",

@@ -56,6 +56,7 @@ DO NOT include any extra text or formatting.`,
         The tech stack used in the job is: ${techstack}.
         The focus between behavioural and technical questions should lean towards: ${type}.
         The amount of questions required is: ${amount}.
+        Make use of this resume text and extract any projects made or experience to generate majority of the questions: ${resumeText}.
         Please return only the questions, without any additional text.
         The questions are going to be read by a voice assistant so do not use "/" or "*" or any other special characters which might break the voice assistant.
         Return the questions formatted like this:

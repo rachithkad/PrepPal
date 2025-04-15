@@ -8,6 +8,7 @@ import DisplayTechIcons from "./DisplayTechIcons";
 import { cn, getRandomInterviewCover } from "@/lib/utils";
 import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
 import InterviewImage from "./InterviewImage";
+import { getCurrentUser } from "@/lib/actions/auth.action";  // Import to get the current user
 
 const InterviewCard = async ({
   interviewId,
@@ -16,9 +17,9 @@ const InterviewCard = async ({
   type,
   techstack,
   createdAt,
-  company
+  company,
 }: InterviewCardProps) => {
-
+  const currentUser = await getCurrentUser();  // Get the logged-in user
   const feedback =
     userId && interviewId
       ? await getFeedbackByInterviewId({
@@ -39,7 +40,7 @@ const InterviewCard = async ({
   const formattedDate = dayjs(
     feedback?.createdAt || createdAt || Date.now()
   ).format("MMM D, YYYY");
-console.log("Company:", company);
+  
   return (
     <div className="card-border w-[360px] max-sm:w-full min-h-96">
       <div className="card-interview">
@@ -54,9 +55,8 @@ console.log("Company:", company);
             <p className="badge-text ">{normalizedType}</p>
           </div>
 
-          
           {/* Cover Image */}
-          <InterviewImage company={company || ""}/>
+          <InterviewImage company={company || ""} />
 
           {/* Interview Role */}
           <h3 className="mt-5 capitalize">{role} Interview</h3>
@@ -92,12 +92,17 @@ console.log("Company:", company);
           <Button className="btn-primary">
             <Link
               href={
-                feedback
-                  ? `/interview/${interviewId}/feedback`
-                  : `/interview/${interviewId}`
+                // Check if the interview belongs to the logged-in user
+                currentUser?.id === userId
+                  ? feedback
+                    ? `/interview/${interviewId}/feedback`
+                    : `/interview/${interviewId}`
+                  : `/interview/${interviewId}`  // Redirect to the interview page if not the logged-in user
               }
             >
-              {feedback ? "Check Feedback" : "View Interview"}
+              {currentUser?.id === userId && feedback
+                ? "Check Feedback"
+                : "View Interview"}
             </Link>
           </Button>
         </div>
