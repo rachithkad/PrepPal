@@ -66,10 +66,10 @@ Mockhiato/
    cd Mockhiato
 
 2. **Install dependencies**:
-
-npm install
-# or
-yarn install
+   ```bash
+   npm install
+      # or
+   yarn install
 
 3. **Set up environment variables**:
 
@@ -83,10 +83,11 @@ NEXT_PUBLIC_VAPI_WEB_TOKEN= your vapi web token
 NEXT_PUBLIC_VAPI_WORKFLOW_ID= your vapi workflow
 
 4. **Run the development server**:
+   ```bash
+   npm run dev
+      # or
+   yarn dev
 
-npm run dev
-# or
-yarn dev
 Open http://localhost:3000 in your browser to view the application.
 
 **Hope this helps you with your Interviews @Kadiri_Rachith**
