@@ -23,32 +23,6 @@ Experience Mockhiato in action: [mockhiato.vercel.app](https://mockhiato.vercel.
 - **State Management**: React Hook Form
 - **Styling**: Tailwind CSS
 
-## 📂 Project Structure
-
-Mockhiato/
-├── app/  -> Next.js app directory (pages/routes)
-│ ├── interview/ -> Routes for interview pages
-│ ├── profile/ -> Routes for profile and user settings
-│ └── layout.tsx -> Root layout component
-├── components/ -> Reusable UI and logic components
-│ ├── Agent.tsx -> AI interview agent
-│ ├── DisplayTechIcons.tsx -> Renders selected tech stack icons
-│ └── ... -> Other UI components
-├── constants/ -> Static data like tech stacks
-├── firebase/ -> Firebase config and initialization
-├── lib/ -> Helper functions and API logic
-│ ├── actions/ -> Firebase and app-specific API calls
-│ └── utils.ts -> Utility functions
-├── public/ -> Static assets (icons, images)
-├── styles/ -> Global and custom CSS (if any)
-├── types/ -> TypeScript interfaces and types
-├── .env.local -> Environment variables (not committed)
-├── tailwind.config.js -> Tailwind CSS configuration
-├── tsconfig.json -> TypeScript configuration
-├── package.json -> Project metadata and dependencies
-└── README.md -> Project documentation
-
-
 
 ## 🧑‍💻 Getting Started
 
