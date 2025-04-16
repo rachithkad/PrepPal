@@ -25,7 +25,28 @@ Experience Mockhiato in action: [mockhiato.vercel.app](https://mockhiato.vercel.
 
 ## 📂 Project Structure
 
-Mockhiato/ ├── app/ # Next.js app directory (pages/routes) │ ├── interview/ # Routes for interview pages │ ├── profile/ # Routes for profile and user settings │ └── layout.tsx # Root layout component ├── components/ # Reusable UI and logic components │ ├── Agent.tsx # AI interview agent │ ├── DisplayTechIcons.tsx # Renders selected tech stack icons │ └── ... # Other UI components ├── constants/ # Static data like tech stacks ├── firebase/ # Firebase config and initialization ├── lib/ # Helper functions and API logic │ ├── actions/ # Firebase and app-specific API calls │ └── utils.ts # Utility functions ├── public/ # Static assets (icons, images) ├── styles/ # Global and custom CSS (if any) ├── types/ # TypeScript interfaces and types ├── .env.local # Environment variables (not committed) ├── tailwind.config.js # Tailwind CSS configuration ├── tsconfig.json # TypeScript configuration ├── package.json # Project metadata and dependencies └── README.md # Project documentation
+Mockhiato/
+├── app/  -> Next.js app directory (pages/routes)
+│ ├── interview/ -> Routes for interview pages
+│ ├── profile/ -> Routes for profile and user settings
+│ └── layout.tsx -> Root layout component
+├── components/ -> Reusable UI and logic components
+│ ├── Agent.tsx -> AI interview agent
+│ ├── DisplayTechIcons.tsx -> Renders selected tech stack icons
+│ └── ... -> Other UI components
+├── constants/ -> Static data like tech stacks
+├── firebase/ -> Firebase config and initialization
+├── lib/ -> Helper functions and API logic
+│ ├── actions/ -> Firebase and app-specific API calls
+│ └── utils.ts -> Utility functions
+├── public/ -> Static assets (icons, images)
+├── styles/ -> Global and custom CSS (if any)
+├── types/ -> TypeScript interfaces and types
+├── .env.local -> Environment variables (not committed)
+├── tailwind.config.js -> Tailwind CSS configuration
+├── tsconfig.json -> TypeScript configuration
+├── package.json -> Project metadata and dependencies
+└── README.md -> Project documentation
 
 
 
@@ -54,13 +75,12 @@ yarn install
 
 Create a .env.local file in the root directory and add the following:
 
-NEXT_PUBLIC_VAPI_WORKFLOW_ID=your_vapi_workflow_id
-NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
-NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
+FIREBASE_PROJECT_ID= your firebase project id
+FIREBASE_PRIVATE_KEY= your firebase private key
+FIREBASE_CLIENT_EMAIL= your firebase client email
+GOOGLE_GENERATIVE_AI_API_KEY= your google generative ai key
+NEXT_PUBLIC_VAPI_WEB_TOKEN= your vapi web token
+NEXT_PUBLIC_VAPI_WORKFLOW_ID= your vapi workflow
 
 4. **Run the development server**:
 
