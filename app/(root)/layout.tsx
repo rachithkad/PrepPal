@@ -16,7 +16,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
       <nav>
         <div className="flex justify-between w-full">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="PrepPal Logo" width={44} height={38} />
+            <Image src="/logo.svg" alt="Mockhiato Logo" width={44} height={38} />
             <h2 className="text-primary-100">Mockhiato</h2>
           </Link>
           <Link href="/profile" className="flex items-end justify-end">
