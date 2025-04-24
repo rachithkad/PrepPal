@@ -10,6 +10,7 @@ import {
   getInterviewsByUserId,
   getLatestInterviews,
 } from "@/lib/actions/general.action";
+import Animation from "@/components/Animation";
 
 async function Home() {
   const user = await getCurrentUser();
@@ -25,7 +26,7 @@ async function Home() {
   return (
     <>
       <FadeIn duration={200}>
-        <section className="card-cta">
+        <section className="card-cta bg-gradient-to-br from-blue-600 to-emerald-600">
           <div className="flex flex-col gap-6 max-w-lg">
             <h2>Get Interview-Ready with AI-Powered Practice & Feedback</h2>
             <p className="text-lg">
@@ -37,13 +38,9 @@ async function Home() {
             </Button>
           </div>
 
-          <Image
-            src="/robot.png"
-            alt="robo-dude"
-            width={400}
-            height={400}
-            className="max-sm:hidden"
-          />
+          <div className="flex items-center justify-center p-8">
+              <Animation />
+          </div>
         </section>
       </FadeIn>
 
