@@ -205,7 +205,7 @@ export async function getUserInterviewStats(userId: string) {
   };
 }
 
-type Feedback = {
+type ResumeFeedback = {
   atsScore: number;
   matched: string[];
   missing: string[];
@@ -222,7 +222,7 @@ export async function getResumeFeedbackById({
 }: {
   resumeId: string;
   userId: string;
-}): Promise<Feedback | null> {
+}): Promise<ResumeFeedback | null> {
   const snapshot = await db
     .collection("resumes")
     .where("resumeId", "==", resumeId)
