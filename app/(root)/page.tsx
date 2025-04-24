@@ -25,7 +25,6 @@ async function Home() {
 
   return (
     <>
-      <FadeIn duration={200}>
         <section className="card-cta bg-gradient-to-br from-blue-600 to-emerald-600">
           <div className="flex flex-col gap-6 max-w-lg">
             <h2>Get Interview-Ready with AI-Powered Practice & Feedback</h2>
@@ -42,7 +41,6 @@ async function Home() {
               <Animation />
           </div>
         </section>
-      </FadeIn>
 
       <FadeIn duration={400}>
         <section className="flex flex-col gap-6 mt-8">

@@ -20,7 +20,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
             <h2 className="text-primary-100">Mockhiato</h2>
           </Link>
           <Link href="/profile" className="flex items-end justify-end">
-            <div className="w-12 h-12 rounded-full bg-muted text-foreground flex items-center justify-center text-2xl font-bold shadow">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg">
               {user?.name?.[0]?.toUpperCase() || "?"}
             </div>
           </Link>
