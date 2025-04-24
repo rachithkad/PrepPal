@@ -1,4 +1,9 @@
 interface Feedback {
+  atsScore: number;
+  matched: never[];
+  missing: never[];
+  suggestions: never[];
+  weaknesses: never[];
   id: string;
   interviewId: string;
   totalScore: number;

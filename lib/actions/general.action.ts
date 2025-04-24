@@ -5,6 +5,7 @@ import { google } from "@ai-sdk/google";
 
 import { db } from "@/firebase/admin";
 import { feedbackSchema } from "@/constants";
+import { collection, getDocs, limit, query, where } from "firebase/firestore";
 
 export async function createFeedback(params: CreateFeedbackParams) {
   const { interviewId, userId, transcript, feedbackId } = params;
@@ -203,3 +204,46 @@ export async function getUserInterviewStats(userId: string) {
     donutChartData: techDonutData,
   };
 }
+
+type Feedback = {
+  atsScore: number;
+  matched: string[];
+  missing: string[];
+  strengths: string[];
+  suggestions: string[];
+  weaknesses: string[];
+  id: string;
+  createdAt: string;
+};
+
+export async function getResumeFeedbackById({
+  resumeId,
+  userId,
+}: {
+  resumeId: string;
+  userId: string;
+}): Promise<Feedback | null> {
+  const snapshot = await db
+    .collection("resumes")
+    .where("resumeId", "==", resumeId)
+    .where("userid", "==", userId)
+    .limit(1)
+    .get();
+
+  if (snapshot.empty) return null;
+
+  const doc = snapshot.docs[0];
+  const data = doc.data();
+  
+  return {
+    atsScore: data.analysis.atsScore ?? 0,
+    matched: data.analysis.keywordAnalysis.matched ?? [],
+    missing: data.analysis.keywordAnalysis.missing ?? [],
+    strengths: data.analysis.strengths ?? [],
+    suggestions: data.analysis.suggestions ?? [],
+    weaknesses: data.analysis.weaknesses ?? [],
+    id: doc.id,
+    createdAt: data.createdAt?.toDate().toISOString() ?? new Date().toISOString(),
+  };
+}
+

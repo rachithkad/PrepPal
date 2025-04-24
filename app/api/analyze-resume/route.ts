@@ -99,21 +99,21 @@ export async function POST(request: Request) {
       prompt,
     });
 
-    console.log("Raw Gemini Analysis:", analysis);
-
     const cleaned = cleanGeminiResponse(analysis);
-    console.log("Cleaned Gemini Analysis:", cleaned);
 
     const parsedAnalysis = JSON.parse(cleaned);
 
     const resumeData = {
       userid,
       createdAt: new Date(),
+      oldResumeText: resumeText,
       analysis: parsedAnalysis,
+      id: "",
     };
 
     const resumeRef = await db.collection("resumes").add(resumeData);
-    console.log("Resume analysis saved with ID:", resumeRef.id);
+    await resumeRef.update({ resumeId: resumeRef.id });
+    // console.log("Resume analysis saved with ID:", resumeRef.id);
 
     return NextResponse.json({ success: true, analysis: parsedAnalysis, id: resumeRef.id }, { status: 200 });
   } catch (error) {
