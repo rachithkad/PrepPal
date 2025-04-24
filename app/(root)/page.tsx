@@ -25,7 +25,7 @@ async function Home() {
 
   return (
     <>
-        <section className="card-cta bg-gradient-to-br from-blue-600 to-emerald-600">
+        <section className="card-cta ">
           <div className="flex flex-col gap-6 max-w-lg">
             <h2>Get Interview-Ready with AI-Powered Practice & Feedback</h2>
             <p className="text-lg">
@@ -37,7 +37,7 @@ async function Home() {
             </Button>
           </div>
 
-          <div className="flex items-center justify-center p-8">
+          <div className="flex items-center justify-center p-8 max-sm:hidden">
               <Animation />
           </div>
         </section>

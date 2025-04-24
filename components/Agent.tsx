@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
 import { interviewer } from "@/constants";
 import { createFeedback } from "@/lib/actions/general.action";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mic, Phone, PhoneOff } from "lucide-react";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -146,77 +148,126 @@ const Agent = ({
   };
 
   return (
-    <>
-      <div className="call-view">
-        {/* AI Interviewer Card */}
-        <div className="card-interviewer">
-          <div className="avatar">
-            <Image
-              src="/ai-avatar.png"
-              alt="profile-image"
-              width={65}
-              height={54}
-              className="object-cover"
-            />
-            {isSpeaking && <span className="animate-speak" />}
+    <div className="min-h-[calc(100vh-80px)] bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Call View */}
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-8">
+          {/* AI Interviewer Card */}
+          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 w-full max-w-md border-2 border-blue-500/30">
+            <div className="relative mx-auto w-32 h-32 mb-4">
+              <Image
+                src="/ai-avatar.png"
+                alt="AI Interviewer"
+                width={128}
+                height={128}
+                className="rounded-full object-cover border-4 border-blue-500"
+              />
+              <AnimatePresence>
+                {isSpeaking && (
+                  <motion.span
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    className="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-2"
+                  >
+                    <Mic className="h-4 w-4 text-white" />
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+            <h3 className="text-xl font-semibold text-center text-gray-900 dark:text-white">
+              AI Interviewer
+            </h3>
           </div>
-          <h3>AI Interviewer</h3>
+
+          {/* User Profile Card */}
+          <div className="relative bg-gradient-to-br from-blue-500 to-blue-600 p-0.5 rounded-2xl w-full max-w-md">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 h-full">
+              <div className="mx-auto w-32 h-32 mb-4">
+                <Image
+                  src="/user-avatar.png"
+                  alt={userName || "User"}
+                  width={128}
+                  height={128}
+                  className="rounded-full object-cover border-4 border-emerald-500"
+                />
+              </div>
+              <h3 className="text-xl font-semibold text-center text-gray-900 dark:text-white">
+                {userName || "You"}
+              </h3>
+            </div>
+          </div>
         </div>
 
-        {/* User Profile Card */}
-        <div className="card-border">
-          <div className="card-content">
-            <Image
-              src="/user-avatar.png"
-              alt="profile-image"
-              width={539}
-              height={539}
-              className="rounded-full object-cover size-[120px]"
-            />
-            <h3>{userName}</h3>
-          </div>
-        </div>
-      </div>
-
-      {messages.length > 0 && (
-        <div className="transcript-border">
-          <div className="transcript">
-            <p
-              key={lastMessage}
-              className={cn(
-                "transition-opacity duration-500 opacity-0",
-                "animate-fadeIn opacity-100"
-              )}
+        {/* Transcript */}
+        <AnimatePresence>
+          {messages.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8 border border-gray-200 dark:border-gray-700 max-w-2xl mx-auto"
             >
-              {lastMessage}
-            </p>
-          </div>
-        </div>
-      )}
+              <div className="flex items-start gap-3">
+                <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full">
+                  <Mic className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+                </div>
+                <motion.p
+                  key={lastMessage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  {lastMessage}
+                </motion.p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      <div className="w-full flex justify-center">
-        {callStatus !== "ACTIVE" ? (
-          <button className="relative btn-call" onClick={() => handleCall()}>
-            <span
-              className={cn(
-                "absolute animate-ping rounded-full opacity-75",
-                callStatus !== "CONNECTING" && "hidden"
+        {/* Call Controls */}
+        <div className="flex justify-center">
+          {callStatus !== "ACTIVE" ? (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleCall}
+              disabled={callStatus === "CONNECTING"}
+              className={`relative flex items-center justify-center gap-2 px-8 py-4 rounded-full text-white font-medium shadow-lg ${
+                callStatus === "CONNECTING"
+                  ? "bg-blue-600 cursor-wait"
+                  : "bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700"
+              }`}
+            >
+              {callStatus === "CONNECTING" && (
+                <motion.span
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="absolute border-2 border-white border-t-transparent rounded-full w-6 h-6"
+                />
               )}
-            />
-
-            <span className="relative">
-              {callStatus === "INACTIVE" || callStatus === "FINISHED"
-                ? "Call"
-                : ". . ."}
-            </span>
-          </button>
-        ) : (
-          <button className="btn-disconnect" onClick={() => handleDisconnect()}>
-            End
-          </button>
-        )}
+              <Phone className="h-5 w-5" />
+              <span>
+                {callStatus === "INACTIVE" || callStatus === "FINISHED"
+                  ? "Start Interview"
+                  : "Connecting..."}
+              </span>
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleDisconnect}
+              className="flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-red-600 hover:bg-red-700 text-white font-medium shadow-lg"
+            >
+              <PhoneOff className="h-5 w-5" />
+              <span>End Interview</span>
+            </motion.button>
+          )}
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

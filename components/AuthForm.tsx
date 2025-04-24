@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { signIn, signUp } from "@/lib/actions/auth.action";
 import FormField from "./FormField";
 import PasswordField from "./PasswordInput";
+import { motion } from "framer-motion";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -128,93 +129,113 @@ const AuthForm = ({ type }: { type: FormType }) => {
   const isSignIn = type === "sign-in";
 
   return (
-    <div className="card-border lg:min-w-[566px]">
-      <div className="flex flex-col gap-6 card py-14 px-10">
-        <div className="flex flex-row gap-2 justify-center">
-          <Image src="/logo.svg" alt="logo" height={32} width={38} />
-          <h2 className="text-primary-100">Mockhiato</h2>
-        </div>
-
-        <h3 className="text-center">Brew Confidence. Ace Interviews.</h3>
-
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(
-              onSubmit,
-              (errors) => {
-                const firstError = Object.values(errors)[0];
-                if (firstError?.message) {
-                  toast.error(firstError.message);
-                }
-              }
-            )}
-            className="w-full space-y-6 mt-4 form"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 w-full max-w-md"
+    >
+      <div className="p-8 sm:p-10">
+        <div className="flex flex-col items-center gap-6">
+          {/* Logo */}
+          <motion.div 
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            className="flex items-center gap-2"
           >
-            {!isSignIn && (
+            <Image 
+              src="/logo.svg" 
+              alt="logo" 
+              height={40} 
+              width={40}
+              className="h-10 w-10"
+            />
+            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-emerald-600">
+              Mockhiato
+            </h2>
+          </motion.div>
+
+          <h3 className="text-lg text-gray-600 dark:text-gray-400 text-center">
+            Brew Confidence. Ace Interviews.
+          </h3>
+
+          {/* Form */}
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="w-full space-y-5 mt-2"
+            >
+              {!isSignIn && (
+                <FormField
+                  control={form.control}
+                  name="name"
+                  label="Name"
+                  placeholder="Your Name"
+                  type="text"
+                />
+              )}
+
               <FormField
                 control={form.control}
-                name="name"
-                label="Name"
-                placeholder="Your Name"
-                type="text"
+                name="email"
+                label="Email"
+                placeholder="Your email address"
+                type="email"
               />
-            )}
 
-            <FormField
-              control={form.control}
-              name="email"
-              label="Email"
-              placeholder="Your email address"
-              type="email"
-            />
+              <PasswordField
+                control={form.control}
+                name="password"
+                label="Password"
+                placeholder="Enter your password"
+                showStrength={!isSignIn}
+              />
 
-            <PasswordField
-              control={form.control}
-              name="password"
-              label="Password"
-              placeholder="Enter your password"
-              showStrength={!isSignIn}
-            />
-
-            {isSignIn && (
-              <p className="text-right text-sm">
-                <button
-                  type="button"
-                  onClick={handleForgotPassword}
-                  className="text-user-primary hover:underline"
-                >
-                  Forgot password?
-                </button>
-              </p>
-            )}
-
-            <Button className="btn" type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Redirecting...
-                </>
-              ) : isSignIn ? (
-                "Sign In"
-              ) : (
-                "Create an Account"
+              {isSignIn && (
+                <div className="text-right">
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
               )}
-            </Button>
 
-          </form>
-        </Form>
+              <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                <Button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="w-full py-6 text-base font-medium bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 shadow-lg"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      {isSignIn ? "Signing In..." : "Creating Account..."}
+                    </>
+                  ) : isSignIn ? (
+                    "Sign In"
+                  ) : (
+                    "Create Account"
+                  )}
+                </Button>
+              </motion.div>
+            </form>
+          </Form>
 
-        <p className="text-center">
-          {isSignIn ? "No account yet?" : "Have an account already?"}
-          <Link
-            href={!isSignIn ? "/sign-in" : "/sign-up"}
-            className="font-bold text-user-primary ml-1"
-          >
-            {!isSignIn ? "Sign In" : "Sign Up"}
-          </Link>
-        </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+            {isSignIn ? "No account yet?" : "Have an account already?"}
+            <Link
+              href={!isSignIn ? "/sign-in" : "/sign-up"}
+              className="ml-1 font-medium text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {!isSignIn ? "Sign In" : "Sign Up"}
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

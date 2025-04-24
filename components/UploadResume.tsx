@@ -1,25 +1,25 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { UploadCloud, FileText } from "lucide-react";
+import { UploadCloud, FileText, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import * as mammoth from "mammoth";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/actions/auth.action";
-import { useRouter } from "next/navigation"; // Updated to use next/navigation
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 const ResumeUploadPage = () => {
   const [parsedText, setParsedText] = useState<string>("");
   const [questions, setQuestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [extracted, setExtracted] = useState<{ role: string; level: string; techstack: string } | null>(null);
-  const [isClient, setIsClient] = useState(false); // Add state to track client-side rendering
+  const [isClient, setIsClient] = useState(false);
 
-  const router = useRouter(); // useRouter for client-side navigation
+  const router = useRouter();
 
   useEffect(() => {
-    // This will ensure router works only on the client side
     setIsClient(true);
   }, []);
 
@@ -48,7 +48,6 @@ const ResumeUploadPage = () => {
 
       setParsedText(textContent);
 
-      // Send to backend
       const res = await fetch("/api/process-resume", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -63,7 +62,6 @@ const ResumeUploadPage = () => {
         setExtracted(data.extracted);
 
         if (isClient) {
-          // Now router.push will work as expected
           router.push("/");
         }
       } else {
@@ -78,42 +76,90 @@ const ResumeUploadPage = () => {
   };
 
   return (
-    <section className="max-w-3xl mx-auto py-10 px-6 overflow-y-hidden">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-primary-200">Upload Your Resume</h1>
-        <p className="text-muted-foreground mt-2 text-base">
+    <motion.section
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8"
+    >
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="text-center mb-12"
+      >
+        <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-emerald-600 mb-4">
+          Upload Your Resume
+        </h1>
+        <p className="text-lg text-gray-600 dark:text-gray-400">
           We'll analyze your resume and create a personalized mock interview.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="relative bg-dark-200 rounded-2xl border border-dark-400 shadow-lg p-10 text-center">
-        <UploadCloud className="mx-auto text-primary-200 size-14 mb-4 animate-bounce" />
-        <p className="text-lg font-medium text-primary-100 mb-2">Drag & drop your resume here</p>
-        <p className="text-sm text-muted-foreground mb-4">Accepted format: DOCX (Max 10MB)</p>
-
-        <label
-          htmlFor="resume-upload"
-          className="cursor-pointer inline-flex items-center gap-2 bg-primary-200 text-black px-6 py-2 rounded-xl text-sm font-semibold hover:bg-primary-100 transition"
-        >
-          <FileText className="size-4" /> Upload Resume
-        </label>
-        <input
-          type="file"
-          id="resume-upload"
-          accept=".docx"
-          className="hidden"
-          onChange={handleFileChange}
-        />
-
-        {loading && <p className="mt-4 text-sm text-muted-foreground animate-pulse">Analyzing resume...</p>}
-
-        <div className="mt-6">
-          <Link href="/generate/form">
-            <Button variant="outline" className="text-sm">Skip & Fill Form</Button>
-          </Link>
+      <motion.div
+        whileHover={{ scale: 1.01 }}
+        className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 sm:p-10 text-center"
+      >
+        <div className="bg-blue-100 dark:bg-blue-900/30 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+          <UploadCloud className="text-blue-500 dark:text-blue-400 size-8 animate-bounce" />
         </div>
-      </div>
-    </section>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          Drag & drop your resume here
+        </h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+          Accepted format: DOCX (Max 10MB)
+        </p>
+
+        <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+          <label
+            htmlFor="resume-upload"
+            className={`cursor-pointer inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg font-medium hover:shadow-md transition-all ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <FileText className="size-5" /> 
+            {loading ? "Processing..." : "Upload Resume"}
+          </label>
+          <input
+            type="file"
+            id="resume-upload"
+            accept=".docx"
+            className="hidden"
+            onChange={handleFileChange}
+            disabled={loading}
+          />
+        </motion.div>
+
+        {loading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-6 flex flex-col items-center"
+          >
+            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Analyzing your resume...
+            </p>
+          </motion.div>
+        )}
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mt-8"
+        >
+          <Link href="/generate/form">
+            <Button variant="outline" className="group">
+              <span className="flex items-center gap-1">
+                Skip & Fill Form
+                <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </Button>
+          </Link>
+        </motion.div>
+      </motion.div>
+    </motion.section>
   );
 };
 

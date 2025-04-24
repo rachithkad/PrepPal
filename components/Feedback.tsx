@@ -107,13 +107,13 @@ const Feedback = ({ feedback, interview, paramID }: any) => {
                                 {feedback?.totalScore > CONFETTI_THRESHOLD && (
                                     <div className="flex items-center justify-center gap-2 text-emerald-400 mt-4">
                                         <Award className="text-xl" />
-                                        <span>Excellent Feedback!</span>
+                                        <span>You killed it!</span>
                                     </div>
                                 )}
                                 {feedback?.totalScore <= CONFETTI_THRESHOLD && (
                                     <div className="flex items-center justify-center gap-2 text-amber-400 mt-4">
                                         <AlertTriangle className="text-xl" />
-                                        <span>Good Feedback.</span>
+                                        <span>Use the feedback to improve.</span>
                                     </div>
                                 )}
                             </CardContent>

@@ -78,7 +78,7 @@ export default function ProgressSnapshot({
     >
       <motion.h2 
         variants={fadeIn}
-        className="text-2xl md:text-3xl font-bold mb-6 text-gray-900 dark:text-white"
+        className="text-2xl text-center md:text-3xl font-bold mb-6 text-gray-900 dark:text-white"
       >
         Progress Snapshot
       </motion.h2>

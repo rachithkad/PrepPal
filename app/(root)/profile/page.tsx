@@ -14,7 +14,7 @@ export default async function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="min-h-screen text-foreground">
       <ProfileHeader name={user.name} email={user.email} />
       <ProfileContent userId={user.id} />
     </main>
