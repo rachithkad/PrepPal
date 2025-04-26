@@ -11,6 +11,7 @@ import FormField from "@/components/FormField";
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import { useRouter } from "next/navigation";
 import React from "react";
+import Dropdown from "@/components/Dropdown";
 
 const GenerateInterviewForm = () => {
   const form = useForm<GenerateInterviewInput>({
@@ -92,11 +93,16 @@ const GenerateInterviewForm = () => {
               label="What role would you like to prepare for?"
               placeholder="e.g., Frontend Engineer"
             />
-            <FormField
+            <Dropdown
               control={form.control}
               name="type"
               label="Are you aiming for a behavioral or technical interview?"
-              placeholder="e.g., Technical"
+              placeholder="Select interview type"
+              options={[
+                { value: "technical", label: "Technical" },
+                { value: "behavioral", label: "Behavioral" },
+                { value: "mixed", label: "Mixed" },
+              ]}
             />
             <FormField
               control={form.control}
