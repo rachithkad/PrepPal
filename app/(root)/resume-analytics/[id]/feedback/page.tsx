@@ -13,7 +13,7 @@ import { FiCheckCircle, FiAlertTriangle, FiInfo, FiAward } from "react-icons/fi"
 import FadeIn from "@/components/FadeIn";
 
 const COLORS = ["#4ade80", "#f87171"];
-const CONFETTI_THRESHOLD = 70;
+const CONFETTI_THRESHOLD = 69;
 
 type Feedback = {
   atsScore: number;

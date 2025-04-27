@@ -253,7 +253,7 @@ export default function ResumeAnalytics() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="space-y-6 p-8 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg"
+            className="space-y-6 p-8 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg justify-center items-center text-center"
           >
             <motion.div 
               initial={{ opacity: 0 }}
