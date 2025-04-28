@@ -23,6 +23,30 @@ Experience Mockhiato in action: [mockhiato.vercel.app](https://mockhiato.vercel.
 - **State Management**: React Hook Form
 - **Styling**: Tailwind CSS
 
+## 📂 Project Structure
+
+Mockhiato/  
+├── app/  -> Next.js app directory (pages/routes)  
+│ ├── interview/ -> Routes for interview pages  
+│ ├── profile/ -> Routes for profile and user settings  
+│ └── layout.tsx -> Root layout component  
+├── components/ -> Reusable UI and logic components  
+│ ├── Agent.tsx -> AI interview agent  
+│ ├── DisplayTechIcons.tsx -> Renders selected tech stack icons  
+│ └── ... -> Other UI components  
+├── constants/ -> Static data like tech stacks  
+├── firebase/ -> Firebase config and initialization  
+├── lib/ -> Helper functions and API logic  
+│ ├── actions/ -> Firebase and app-specific API calls  
+│ └── utils.ts -> Utility functions  
+├── public/ -> Static assets (icons, images)  
+├── styles/ -> Global and custom CSS (if any)  
+├── types/ -> TypeScript interfaces and types  
+├── .env.local -> Environment variables (not committed)  
+├── tailwind.config.js -> Tailwind CSS configuration  
+├── tsconfig.json -> TypeScript configuration  
+├── package.json -> Project metadata and dependencies  
+└── README.md -> Project documentation  
 
 ## 🧑‍💻 Getting Started
 
@@ -49,12 +73,12 @@ Experience Mockhiato in action: [mockhiato.vercel.app](https://mockhiato.vercel.
 
 Create a .env.local file in the root directory and add the following:
 
-FIREBASE_PROJECT_ID= your firebase project id
-FIREBASE_PRIVATE_KEY= your firebase private key
-FIREBASE_CLIENT_EMAIL= your firebase client email
-GOOGLE_GENERATIVE_AI_API_KEY= your google generative ai key
-NEXT_PUBLIC_VAPI_WEB_TOKEN= your vapi web token
-NEXT_PUBLIC_VAPI_WORKFLOW_ID= your vapi workflow
+FIREBASE_PROJECT_ID= your firebase project id  
+FIREBASE_PRIVATE_KEY= your firebase private key  
+FIREBASE_CLIENT_EMAIL= your firebase client email  
+GOOGLE_GENERATIVE_AI_API_KEY= your google generative ai key  
+NEXT_PUBLIC_VAPI_WEB_TOKEN= your vapi web token  
+NEXT_PUBLIC_VAPI_WORKFLOW_ID= your vapi workflow  
 
 4. **Run the development server**:
    ```bash
