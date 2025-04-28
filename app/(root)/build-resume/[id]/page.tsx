@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams } from "next/navigation";
 import { Button } from '@/components/ui/button';
-import { Printer } from 'lucide-react';
+import { Printer, Download } from 'lucide-react';
 import { fetchResumeData } from '@/lib/actions/general.action';
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import FadeIn from "@/components/FadeIn";
 import { toast } from "sonner";
 import { ErrorLoading } from '@/components/ErrorLoading';
+import htmlDocx from 'html-docx-js/dist/html-docx';
 
 interface ResumeData {
   enhancedResumeText: string;
@@ -115,6 +116,41 @@ export default function BuildResumePage() {
   };
 
   
+  const downloadResume = () => {
+    if (!enhancedText) return;
+  
+    const html = `
+      <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 1in;
+            }
+            h1, h2, h3 {
+              color: #006699;
+            }
+          </style>
+        </head>
+        <body>
+          ${enhancedText}
+        </body>
+      </html>
+    `;
+  
+    const docxBlob = htmlDocx.asBlob(html);
+    const url = URL.createObjectURL(docxBlob);
+  
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'enhanced_resume.docx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  
+    URL.revokeObjectURL(url);
+  };
+  
   
 
   if (loading || !resumeData) {
@@ -165,6 +201,15 @@ export default function BuildResumePage() {
           >
             <Printer className="w-4 h-4" />
             Print
+          </Button>
+
+          <Button 
+            onClick={downloadResume}
+            variant="outline"
+            className="gap-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            <Download className="w-4 h-4" />
+            Download .docx
           </Button>
         </div>
       </div>
