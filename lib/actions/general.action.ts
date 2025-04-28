@@ -213,7 +213,6 @@ type ResumeFeedback = {
   suggestions: string[];
   weaknesses: string[];
   id: string;
-  createdAt: string;
 };
 
 export async function getResumeFeedbackById({
@@ -243,7 +242,166 @@ export async function getResumeFeedbackById({
     suggestions: data.analysis.suggestions ?? [],
     weaknesses: data.analysis.weaknesses ?? [],
     id: doc.id,
-    createdAt: data.createdAt?.toDate().toISOString() ?? new Date().toISOString(),
   };
 }
 
+interface ResumeData {
+  enhancedResumeText: string;
+  [key: string]: any; // Add other properties as needed
+}
+
+interface EnhanceResumeResponse {
+  success: boolean;
+  enhancedResume?: string;
+  fromCache?: boolean;
+  error?: string;
+}
+
+interface EnhanceResumeOptions {
+  timeout?: number;
+}
+
+export async function postEnhanceResume(
+  resumeId: string,
+  options: EnhanceResumeOptions = {}
+): Promise<EnhanceResumeResponse> {
+  const { timeout = 30000 } = options;
+  
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    const baseUrl = typeof window !== 'undefined' 
+      ? window.location.origin 
+      : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+    const response = await fetch(`${baseUrl}/api/enhance-resume`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ resumeId }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    // First check if the response is OK
+    if (!response.ok) {
+      let errorMessage = `Request failed with status ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {
+        console.error('Failed to parse error response', e);
+      }
+      throw new Error(errorMessage);
+    }
+
+    // Check if response has content
+    const contentLength = response.headers.get('content-length');
+    if (contentLength === '0') {
+      throw new Error('Empty response from server');
+    }
+
+    // Parse the JSON response
+    let responseData;
+    try {
+      responseData = await response.json();
+    } catch (e) {
+      console.error('Failed to parse response JSON:', e);
+      throw new Error('Invalid response format from server');
+    }
+
+    // Validate the response structure
+    if (typeof responseData !== 'object' || responseData === null) {
+      throw new Error('Invalid response format from server');
+    }
+    console.log("success:", responseData.success ?? false,
+      "enhancedResume:", responseData.enhancedResume,
+      "fromCache:", responseData.fromCache ?? false,
+      "error:", responseData.error);
+    return {
+      success: responseData.success ?? false,
+      enhancedResume: responseData.enhancedResume,
+      fromCache: responseData.fromCache ?? false,
+      error: responseData.error
+    };
+
+  } catch (error) {
+    console.error('Error enhancing resume:', error);
+    
+    return { 
+      success: false, 
+      error: error instanceof Error ? 
+        error.message : 
+        'Failed to enhance resume',
+      ...(error instanceof Error && error.name === 'AbortError' 
+        ? { error: 'Request timed out. Please try again.' }
+        : {})
+    };
+  }
+}
+
+export async function fetchResumeData(resumeId: string | string[]): Promise<ResumeData> {
+  try {
+    const id = Array.isArray(resumeId) ? resumeId[0] : resumeId;
+
+    const snapshot = await db
+      .collection("resumes")
+      .where("resumeId", "==", id)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      throw new Error('Resume data not found');
+    }
+
+    const doc = snapshot.docs[0];
+    const data = doc.data();
+    if (!doc.exists) {
+      throw new Error('Resume not found');
+    }
+
+    return {enhancedResumeText: data.enhancedResumeText,
+      htmlResume: data.htmlResume
+    } as ResumeData;
+  } catch (err) {
+    console.error('Error fetching resume:', err);
+    throw err; // rethrow so caller can handle
+  }
+}
+
+export async function getResumesByUserId(userId: string) {
+  
+  const resumes = await db
+    .collection("resumes")
+    .where("userid", "==", userId)
+    .orderBy("createdAt", "desc")
+    .get();
+
+    return resumes.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as ResumeDocument[];
+}
+
+export async function getDateByResumeID(userId: string, resumeId: string) {
+  
+  const snapshot = await db
+    .collection("resumes")
+    .where("resumeId", "==", resumeId)
+    .where("userid", "==", userId)
+    .limit(1)
+    .get();
+
+    if (snapshot.empty) return null;
+
+    const doc = snapshot.docs[0];
+    const data = doc.data();
+
+    return {
+      createdAt: data.createdAt,
+    };
+}

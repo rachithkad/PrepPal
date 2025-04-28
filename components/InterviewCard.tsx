@@ -37,10 +37,10 @@ const InterviewCard = async ({
 
   const normalizedType = /mix/gi.test(type) ? "Mixed" : type;
   const badgeColor = {
-    Behavioral: "bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200",
+    Behavioral: "bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-200",
     Mixed: "bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-200",
     Technical: "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200",
-  }[normalizedType] || "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
+  }[normalizedType] || "bg-teal-100 dark:bg-teal-800 text-teal-800 dark:text-teal-200";
 
   const formattedDate = dayjs(
     feedback?.createdAt || createdAt || Date.now()
@@ -51,12 +51,14 @@ const InterviewCard = async ({
       {/* Type Badge */}
       <div
         className={cn(
-          "absolute top-0 right-0 px-3 py-1.5 rounded-bl-lg text-sm font-medium z-10",
+          "absolute top-4 right-4 px-3 py-1 rounded-md text-xs font-semibold z-10 shadow border border-gray-200 dark:border-gray-700",
           badgeColor
         )}
       >
         {normalizedType}
       </div>
+
+
 
       <div className="p-6 h-full flex flex-col">
         <div className="flex-grow">

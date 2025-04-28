@@ -104,3 +104,28 @@ interface InterviewFormProps {
 interface TechIconProps {
   techStack: string[];
 }
+
+
+interface ResumeDocument {
+  id: string;
+  userid: string;
+  analysis: {
+    atsScore: number;
+    keywordAnalysis: {
+      matched: string[];
+      missing: string[];
+    };
+    strengths: string[];
+    weaknesses: string[];
+    suggestions: string[];
+    jobRole: string;
+  };
+  createdAt: Date | string;
+  enhancedAt: Date | string;
+  enhancedResumeText: string;
+  enhancementFailed: boolean;
+  htmlResume: string;
+  jobDescription: string;
+  oldResumeText: string;
+  resumeId: string;
+}

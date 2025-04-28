@@ -3,7 +3,6 @@
 import { useEffect, useState, ChangeEvent, useRef } from "react";
 import { motion } from "framer-motion";
 import mammoth from "mammoth";
-import html2pdf from "html2pdf.js";
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
 const LOCAL_STORAGE_KEY = "mockhiato_resume_data";
 

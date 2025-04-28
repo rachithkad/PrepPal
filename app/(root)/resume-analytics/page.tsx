@@ -9,6 +9,7 @@ import { getCurrentUser } from "@/lib/actions/auth.action";
 import { FileText, UploadCloud, ScrollText, CheckCircle, XCircle, Bot } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { ErrorLoading } from "@/components/ErrorLoading";
 
 // Chat-style typing simulation steps
 const typingSteps = [
@@ -30,6 +31,7 @@ export default function ResumeAnalytics() {
   const [file, setFile] = useState<File | null>(null);
   const [typingIndex, setTypingIndex] = useState(0);
   const [showTypingUI, setShowTypingUI] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -97,6 +99,7 @@ export default function ResumeAnalytics() {
   
       if (!response.ok || !result.success) {
         throw new Error(result.error || "Analysis failed");
+        setError(result.error instanceof Error ? result.error.message : 'Failed to load resume');
       }
   
       toast.success("Analysis completed successfully!");
@@ -116,6 +119,12 @@ export default function ResumeAnalytics() {
       setLoading(false);
     }
   };
+
+  if (error) {
+    return (
+      <ErrorLoading message={"Error Analyzing Resume"} error={error}/>
+    );
+  }
 
   return (
     <motion.section 

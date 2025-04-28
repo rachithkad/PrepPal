@@ -45,6 +45,7 @@ Provide a comprehensive analysis with the following sections:
 3. Strengths - Highlight 3-5 strong points of the resume
 4. Weaknesses - Identify 3-5 areas that need improvement
 5. Suggestions - Provide actionable recommendations to improve the resume
+6. Infer the role based on the jJob Description provided
 
 Format your response as valid JSON:
 {
@@ -55,57 +56,11 @@ Format your response as valid JSON:
   },
   "strengths": string[],
   "weaknesses": string[],
-  "suggestions": string[]
+  "suggestions": string[],
+  "jobRole": string[]
 }`;
 }
 
-function buildEnhancementPrompt(resumeText: string, analysis: any, jobDescription: string = ""): string {
-  // Safely get array properties with fallbacks
-  const strengths = Array.isArray(analysis?.strengths) ? analysis.strengths : [];
-  const weaknesses = Array.isArray(analysis?.weaknesses) ? analysis.weaknesses : [];
-  const suggestions = Array.isArray(analysis?.suggestions) ? analysis.suggestions : [];
-  const atsScore = typeof analysis?.atsScore === 'number' ? analysis.atsScore : 0;
-
-  return `Role: You are a professional resume writer with expertise in ATS optimization. Your task is to create an enhanced version of the provided resume that addresses all the weaknesses and incorporates all suggestions from the analysis, while maintaining the original strengths.
-
-Original Resume:
-"""
-${resumeText}
-"""
-
-Job Description:
-"""
-${jobDescription || "No job description provided"}
-"""
-
-Analysis Summary:
-- ATS Score: ${atsScore}
-- Strengths: ${strengths.length > 0 ? strengths.join(", ") : "None identified"}
-- Weaknesses: ${weaknesses.length > 0 ? weaknesses.join(", ") : "None identified"}
-- Suggestions: ${suggestions.length > 0 ? suggestions.join(", ") : "None provided"}
-
-Create a significantly enhanced resume with these improvements:
-1. Optimize for ATS with proper formatting and structure
-2. Incorporate all missing keywords from the job description naturally
-3. Address all weaknesses from the analysis
-4. Implement all suggestions while preserving the original strengths
-5. Use professional, achievement-oriented language with quantifiable results
-6. Ensure perfect grammar, spelling, and consistency
-7. Include a skills section tailored to the job description
-8. Structure work experience using the STAR method (Situation, Task, Action, Result)
-9. Add measurable achievements with metrics where possible
-10. Use powerful action verbs and industry-specific terminology
-
-Format the enhanced resume with these sections:
-- Professional Summary (3-4 lines)
-- Key Skills (bullet points)
-- Professional Experience (with achievements)
-- Education
-- Certifications (if applicable)
-- Projects (if applicable)
-
-Return ONLY the enhanced resume content in proper formatting (don't include analysis or explanations). Use clear section headings, bullet points for lists, and maintain professional formatting.`;
-}
 
 function cleanGeminiResponse(raw: string): string {
   try {
@@ -163,18 +118,12 @@ export async function POST(request: Request) {
 
     const parsedAnalysis = JSON.parse(cleaned);
 
-    const newPrompt = buildEnhancementPrompt(resumeText, parsedAnalysis, jobDescription);
-    const { text: enhancedResume } = await generateText({
-      model: google("gemini-1.5-pro"),
-      prompt: newPrompt,
-    });
-
     const resumeData = {
       userid,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
       oldResumeText: resumeText,
       analysis: parsedAnalysis,
-      enhancedResume: enhancedResume,
+      jobDescription: jobDescription,
       id: "",
     };
 
@@ -195,6 +144,8 @@ export async function POST(request: Request) {
     );
   }
 }
+
+
 
 export async function GET() {
   return Response.json({ success: true, data: "Thank you!" }, { status: 200 });
