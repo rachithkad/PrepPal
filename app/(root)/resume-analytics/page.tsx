@@ -98,8 +98,9 @@ export default function ResumeAnalytics() {
       const result = await response.json();
   
       if (!response.ok || !result.success) {
-        throw new Error(result.error || "Analysis failed");
+        toast.error("Failed");
         setError(result.error instanceof Error ? result.error.message : 'Failed to load resume');
+        throw new Error(result.error || "Analysis failed");
       }
   
       toast.success("Analysis completed successfully!");

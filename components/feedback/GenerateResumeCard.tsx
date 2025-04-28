@@ -97,7 +97,7 @@ export default function GenerateResumeCard({
                 <Button
                   onClick={handleGenerateResume}
                   disabled={isGenerating}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white py-6 px-8 rounded-lg transition-all flex items-center gap-2"
+                  className="bg-indigo-600 cursor-pointer hover:bg-indigo-700 text-white py-6 px-8 rounded-lg transition-all flex items-center gap-2"
                 >
                   {isGenerating ? (
                     <>

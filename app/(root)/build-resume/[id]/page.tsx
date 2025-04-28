@@ -147,22 +147,28 @@ export default function BuildResumePage() {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header Section */}
       <FadeIn duration={600}>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Your Enhanced Resume</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">AI-optimized and ready to impress</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button 
-              onClick={printResume}
-              variant="outline" 
-              className="gap-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
-              <Printer className="w-4 h-4" />
-              Print
-            </Button>
-          </div>
+      <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4 text-center sm:text-left">
+        <div>
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-emerald-500">
+            Your Enhanced Resume
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            AI-optimized and ready to impress
+          </p>
         </div>
+
+        <div className="flex flex-wrap gap-2">
+          <Button 
+            onClick={printResume}
+            variant="outline"
+            className="gap-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            <Printer className="w-4 h-4" />
+            Print
+          </Button>
+        </div>
+      </div>
+
       </FadeIn>
 
       {/* Resume Content */}
