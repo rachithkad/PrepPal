@@ -63,7 +63,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
         {/* Mobile Navigation */}
         <div className="md:hidden flex items-center justify-center gap-8 mt-4">
           <Link 
-            href="/mock-interview" 
+            href="/generate" 
             className="flex flex-col items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
           >
             <Mic className="h-5 w-5" />
