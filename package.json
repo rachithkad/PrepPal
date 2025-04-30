@@ -36,6 +36,7 @@
     "gsap": "^3.12.7",
     "html-docx-js": "^0.3.1",
     "html-react-parser": "^5.2.3",
+    "html-to-text": "^9.0.5",
     "html2pdf.js": "^0.10.3",
     "jspdf": "^3.0.1",
     "lucide-react": "^0.487.0",

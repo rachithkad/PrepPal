@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import FadeIn from "@/components/FadeIn";
 import { toast } from "sonner";
 import { ErrorLoading } from '@/components/ErrorLoading';
-import htmlDocx from 'html-docx-js/dist/html-docx';
+import { Document, HeadingLevel, Packer, Paragraph, TextRun } from "docx";
 
 interface ResumeData {
   enhancedResumeText: string;
@@ -30,7 +30,6 @@ export default function BuildResumePage() {
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -116,38 +115,92 @@ export default function BuildResumePage() {
   };
 
   
-  const downloadResume = () => {
+  function htmlToDocxParagraphs(html: string): Paragraph[] {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const elements = Array.from(doc.body.childNodes);
+    const paragraphs: Paragraph[] = [];
+  
+    elements.forEach(node => {
+      if (!(node instanceof HTMLElement)) return;
+  
+      switch (node.tagName.toLowerCase()) {
+        case "h1":
+        case "h2":
+        case "h3":
+          paragraphs.push(
+            new Paragraph({
+              text: node.textContent || "",
+              heading:
+                node.tagName.toLowerCase() === "h1"
+                  ? HeadingLevel.HEADING_1
+                  : node.tagName.toLowerCase() === "h2"
+                  ? HeadingLevel.HEADING_2
+                  : HeadingLevel.HEADING_3,
+              spacing: { after: 200 },
+            })
+          );
+          break;
+  
+        case "p":
+          const runs: TextRun[] = [];
+          node.childNodes.forEach(child => {
+            if (child.nodeType === Node.TEXT_NODE) {
+              runs.push(new TextRun({ text: child.textContent || "" }));
+            } else if (child.nodeType === Node.ELEMENT_NODE) {
+              const el = child as HTMLElement;
+              const isBold = el.tagName.toLowerCase() === "b" || el.tagName.toLowerCase() === "strong";
+              runs.push(
+                new TextRun({
+                  text: el.textContent || "",
+                  bold: isBold,
+                })
+              );
+            }
+          });
+          paragraphs.push(new Paragraph({ children: runs }));
+          break;
+  
+        case "ul":
+          node.querySelectorAll("li").forEach(li => {
+            paragraphs.push(
+              new Paragraph({
+                text: li.textContent || "",
+                bullet: { level: 0 },
+              })
+            );
+          });
+          break;
+  
+        case "br":
+          paragraphs.push(new Paragraph({ text: "" }));
+          break;
+  
+        default:
+          paragraphs.push(new Paragraph({ text: node.textContent || "" }));
+      }
+    });
+  
+    return paragraphs;
+  }
+  
+  const downloadResume = async () => {
     if (!enhancedText) return;
   
-    const html = `
-      <html>
-        <head>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              margin: 1in;
-            }
-            h1, h2, h3 {
-              color: #006699;
-            }
-          </style>
-        </head>
-        <body>
-          ${enhancedText}
-        </body>
-      </html>
-    `;
+    const doc = new Document({
+      sections: [
+        {
+          children: htmlToDocxParagraphs(enhancedText),
+        },
+      ],
+    });
   
-    const docxBlob = htmlDocx.asBlob(html);
-    const url = URL.createObjectURL(docxBlob);
-  
-    const a = document.createElement('a');
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'enhanced_resume.docx';
-    document.body.appendChild(a);
+    a.download = "enhanced_resume.docx";
     a.click();
-    document.body.removeChild(a);
-  
     URL.revokeObjectURL(url);
   };
   

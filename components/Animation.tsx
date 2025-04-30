@@ -147,7 +147,6 @@ const Animation = () => {
             <motion.div
                 ref={mainCircleRef}
                 className="absolute z-10 w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 shadow-xl"
-                whileHover={{ scale: 1.15 }}
                 whileTap={{ scale: 0.95 }}
             />
             
@@ -155,7 +154,6 @@ const Animation = () => {
             <motion.div
                 ref={circle1Ref}
                 className="absolute z-30 w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 shadow-lg cursor-pointer"
-                whileHover={{ scale: 1.3 }}
                 whileTap={{ scale: 0.9 }}
                 style={{ x: 0, y: 0 }}
             />
@@ -163,7 +161,6 @@ const Animation = () => {
             <motion.div
                 ref={circle2Ref}
                 className="absolute z-20 w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-emerald-400 shadow-lg cursor-pointer"
-                whileHover={{ scale: 1.3 }}
                 whileTap={{ scale: 0.9 }}
                 style={{ x: 0, y: 0 }}
             />
@@ -171,7 +168,6 @@ const Animation = () => {
             <motion.div
                 ref={circle3Ref}
                 className="absolute z-40 w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-rose-400 shadow-lg cursor-pointer"
-                whileHover={{ scale: 1.3 }}
                 whileTap={{ scale: 0.9 }}
                 style={{ x: 0, y: 0 }}
             />

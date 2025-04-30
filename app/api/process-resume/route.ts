@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   try {
     // Step 1: Extract info from resume
     const { text: extracted } = await generateText({
-      model: google("gemini-1.5-pro"), // More reliable than flash-001
+      model: google("gemini-1.5-pro"),
       prompt: `Extract the following information from the resume text below:
 - Job Role or Title
 - Experience Level (e.g., Intern, Junior, Mid-Level, Senior, Lead, etc.)
@@ -33,6 +33,8 @@ Return the result as valid JSON:
 
 DO NOT include any extra text or formatting.`,
     });
+
+    console.log("Extracted :",extracted);
 
     const cleaned = extracted
       .replace(/^```json/gm, "")
@@ -90,5 +92,5 @@ DO NOT include any extra text or formatting.`,
 }
 
 export async function GET() {
-  return Response.json({ success: true, data: "Thank you!" }, { status: 200 });
+  return Response.json({ success: true, data: "Resume processing service is operational" }, { status: 200 });
 }

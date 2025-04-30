@@ -5,7 +5,7 @@ interface ErrorLoadingProps {
   error: string;
 }
 
-const ErrorLoading = async ({ message, error }: ErrorLoadingProps) => {
+const ErrorLoading = ({ message, error }: ErrorLoadingProps) => {
   return (
     <div className="max-w-2xl mx-auto p-6 flex flex-col items-center justify-center min-h-[60vh]">
       <div className="w-full rounded-xl border border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-950 p-6 shadow-md">

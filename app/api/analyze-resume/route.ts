@@ -45,7 +45,7 @@ Provide a comprehensive analysis with the following sections:
 3. Strengths - Highlight 3-5 strong points of the resume
 4. Weaknesses - Identify 3-5 areas that need improvement
 5. Suggestions - Provide actionable recommendations to improve the resume
-6. Infer the role based on the jJob Description provided
+6. Infer the role based on the Job Description provided
 
 Format your response as valid JSON:
 {
@@ -63,29 +63,46 @@ Format your response as valid JSON:
 
 
 function cleanGeminiResponse(raw: string): string {
+  // Try direct parse first
   try {
-    // First try to parse directly if it's clean JSON
     JSON.parse(raw);
     return raw;
-  } catch {
-    // If not, try to clean it
-    const cleaned = raw
-      .replace(/^```(json)?/gm, "")
-      .replace(/```$/gm, "")
-      .replace(/\/\/.*$/gm, "")
-      .replace(/[^\x20-\x7E\u00a9\u00ae\u2000-\u3300\ud83c\ud000-\udfff\ud83d\ud000-\udfff\ud83e\ud000-\udfff]/g, '')
-      .split('\n')
-      .map(line => line.trim())
-      .join('\n')
-      .replace(/\s+/g, ' ')
-      .trim();
-    
-    // Remove any remaining non-JSON content
-    const jsonStart = cleaned.indexOf('{');
-    const jsonEnd = cleaned.lastIndexOf('}') + 1;
-    return cleaned.slice(jsonStart, jsonEnd);
+  } catch {}
+
+  // Remove markdown code fences and comments
+  let cleaned = raw
+    .replace(/^```(?:json)?/gm, '')
+    .replace(/```$/gm, '')
+    .replace(/\/\/.*$/gm, '')
+    .trim();
+
+  // Try to find a valid JSON object or array
+  const firstBrace = cleaned.indexOf('{');
+  const firstBracket = cleaned.indexOf('[');
+
+  let jsonStart = -1;
+  if (firstBrace !== -1 && (firstBrace < firstBracket || firstBracket === -1)) {
+    jsonStart = firstBrace;
+  } else if (firstBracket !== -1) {
+    jsonStart = firstBracket;
+  }
+
+  const jsonEnd = Math.max(cleaned.lastIndexOf('}'), cleaned.lastIndexOf(']')) + 1;
+  if (jsonStart === -1 || jsonEnd === 0) {
+    throw new Error("Could not locate valid JSON start/end");
+  }
+
+  const sliced = cleaned.slice(jsonStart, jsonEnd);
+
+  try {
+    JSON.parse(sliced);
+    return sliced;
+  } catch (err) {
+    console.error("Invalid cleaned JSON:\n", sliced);
+    throw new Error("Still not valid JSON after cleanup");
   }
 }
+
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -148,5 +165,5 @@ export async function POST(request: Request) {
 
 
 export async function GET() {
-  return Response.json({ success: true, data: "Thank you!" }, { status: 200 });
+  return Response.json({ success: true, data: "Resume enhancement analytics is operational" }, { status: 200 });
 }

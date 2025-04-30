@@ -98,7 +98,7 @@ export default function ResumeAnalytics() {
       const result = await response.json();
   
       if (!response.ok || !result.success) {
-        toast.error("Failed");
+        toast.error("Failed",result.error);
         setError(result.error instanceof Error ? result.error.message : 'Failed to load resume');
         throw new Error(result.error || "Analysis failed");
       }
@@ -120,6 +120,53 @@ export default function ResumeAnalytics() {
       setLoading(false);
     }
   };
+
+  const handleGenerateCoverLetter = async () => {
+    if (!file) {
+      toast.error("Please upload a resume first.");
+      return;
+    }
+  
+    if (!jobDescription.trim()) {
+      toast.error("Please enter a job description.");
+      return;
+    }
+  
+    try {
+      const user = await getCurrentUser();
+  
+      const formData = new FormData();
+      formData.append("resume", file);
+      formData.append("jobDescription", jobDescription);
+      if (user?.id) {
+        formData.append("userid", user.id);
+      }
+  
+      const response = await fetch("/api/generate-cover-letter", {
+        method: "POST",
+        body: formData,
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok || !result.success) {
+        toast.error("Cover letter generation failed.");
+        throw new Error(result.error || "Failed to generate cover letter.");
+      }
+  
+      toast.success("Cover letter generated!");
+  
+      // Redirect to the cover letter page (if applicable)
+      if (result.coverLetterId) {
+        router.push(`/cover-letter/${result.coverLetterId}`);
+      }
+    } catch (err) {
+      console.error("Cover letter generation error:", err);
+      toast.error(err instanceof Error ? err.message : "Unexpected error.");
+    } finally {
+    }
+  };
+  
 
   if (error) {
     return (
@@ -238,7 +285,7 @@ export default function ResumeAnalytics() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="text-center"
+              className="flex flex-wrap justify-center gap-4"
             >
               <Button
                 onClick={handleAnalyze}
@@ -254,7 +301,18 @@ export default function ResumeAnalytics() {
                   "Analyze Now"
                 )}
               </Button>
+
+              <Button
+                onClick={handleGenerateCoverLetter}
+                disabled={loading || !file || !jobDescription.trim()}
+                variant="outline"
+                className="px-8 py-4 text-lg font-medium rounded-lg border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all"
+              >
+                <ScrollText className="w-5 h-5 mr-2" />
+                Generate Cover Letter
+              </Button>
             </motion.div>
+
           </motion.div>
         ) : (
           // Typing UI
