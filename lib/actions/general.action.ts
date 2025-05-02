@@ -261,6 +261,17 @@ interface EnhanceResumeOptions {
   timeout?: number;
 }
 
+export interface GenerateCoverLetterOptions {
+  timeout?: number;
+}
+
+export interface GenerateCoverLetterResponse {
+  success: boolean;
+  htmlCoverLetter?: string;
+  fromCache?: boolean;
+  error?: string;
+}
+
 export async function postEnhanceResume(
   resumeId: string,
   options: EnhanceResumeOptions = {}
@@ -344,6 +355,88 @@ export async function postEnhanceResume(
   }
 }
 
+export async function postGenerateCoverLetter(
+  resumeId: string,
+  options: GenerateCoverLetterOptions = {}
+): Promise<GenerateCoverLetterResponse> {
+  const { timeout = 30000 } = options;
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    const baseUrl = typeof window !== 'undefined'
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+    const response = await fetch(`${baseUrl}/api/generate-cover-letter`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ resumeId }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      let errorMessage = `Request failed with status ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {
+        console.error('Failed to parse error response', e);
+      }
+      throw new Error(errorMessage);
+    }
+
+    const contentLength = response.headers.get('content-length');
+    if (contentLength === '0') {
+      throw new Error('Empty response from server');
+    }
+
+    let responseData;
+    try {
+      responseData = await response.json();
+    } catch (e) {
+      console.error('Failed to parse response JSON:', e);
+      throw new Error('Invalid response format from server');
+    }
+
+    if (typeof responseData !== 'object' || responseData === null) {
+      throw new Error('Invalid response format from server');
+    }
+
+    console.log(
+      "success:", responseData.success ?? false,
+      "htmlCoverLetter:", responseData.htmlCoverLetter,
+      "fromCache:", responseData.fromCache ?? false,
+      "error:", responseData.error
+    );
+
+    return {
+      success: responseData.success ?? false,
+      htmlCoverLetter: responseData.htmlCoverLetter,
+      fromCache: responseData.fromCache ?? false,
+      error: responseData.error
+    };
+
+  } catch (error) {
+    console.error('Error generating cover letter:', error);
+
+    return {
+      success: false,
+      error: error instanceof Error
+        ? (error.name === 'AbortError'
+          ? 'Request timed out. Please try again.'
+          : error.message)
+        : 'Failed to generate cover letter'
+    };
+  }
+}
+
 export async function fetchResumeData(resumeId: string | string[]): Promise<ResumeData> {
   try {
     const id = Array.isArray(resumeId) ? resumeId[0] : resumeId;
@@ -367,6 +460,36 @@ export async function fetchResumeData(resumeId: string | string[]): Promise<Resu
     return {enhancedResumeText: data.enhancedResumeText,
       htmlResume: data.htmlResume
     } as ResumeData;
+  } catch (err) {
+    console.error('Error fetching resume:', err);
+    throw err; // rethrow so caller can handle
+  }
+}
+
+export async function fetchCoverLetterData(resumeId: string | string[]){
+  try {
+    const id = Array.isArray(resumeId) ? resumeId[0] : resumeId;
+
+    const snapshot = await db
+      .collection("resumes")
+      .where("resumeId", "==", id)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      throw new Error('Resume data not found');
+    }
+
+    const doc = snapshot.docs[0];
+    const data = doc.data();
+    if (!doc.exists) {
+      throw new Error('Resume not found');
+    }
+
+    return {htmlCoverLetter: data.htmlCoverLetter,
+      jobDescription: data.jobDescription,
+      oldResumeText: data.oldResumeText,
+    } ;
   } catch (err) {
     console.error('Error fetching resume:', err);
     throw err; // rethrow so caller can handle

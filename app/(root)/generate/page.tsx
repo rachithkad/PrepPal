@@ -22,14 +22,14 @@ const options = [
     color: "from-purple-500 to-purple-600",
     bgColor: "bg-purple-100/50 dark:bg-purple-900/20"
   },
-  {
-    title: "Via Voice Agent",
-    description: "Talk to our AI agent to create a personalized interview experience.",
-    icon: <Mic className="w-8 h-8" />,
-    href: "/interview",
-    color: "from-emerald-500 to-emerald-600",
-    bgColor: "bg-emerald-100/50 dark:bg-emerald-900/20"
-  },
+  // {
+  //   title: "Via Voice Agent",
+  //   description: "Talk to our AI agent to create a personalized interview experience.",
+  //   icon: <Mic className="w-8 h-8" />,
+  //   href: "/interview",
+  //   color: "from-emerald-500 to-emerald-600",
+  //   bgColor: "bg-emerald-100/50 dark:bg-emerald-900/20"
+  // },
 ];
 
 export default function GenerateInterviewPage() {
@@ -60,7 +60,7 @@ export default function GenerateInterviewPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12"
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12"
         >
           {options.map((opt, index) => (
             <motion.div
