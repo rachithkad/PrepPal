@@ -14,6 +14,11 @@ type DonutChartComponentProps = {
 };
 
 export default function DonutChartComponent({ data }: DonutChartComponentProps) {
+  // Sort and take the top 8
+  const topData = [...data]
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 8);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -21,10 +26,10 @@ export default function DonutChartComponent({ data }: DonutChartComponentProps) 
       transition={{ duration: 0.5 }}
       className="w-full h-full"
     >
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={350}>
         <PieChart>
           <Pie
-            data={data}
+            data={topData}
             dataKey="value"
             nameKey="tech"
             cx="50%"
@@ -37,7 +42,7 @@ export default function DonutChartComponent({ data }: DonutChartComponentProps) 
             animationDuration={1000}
             animationEasing="ease-out"
           >
-            {data.map((entry, index) => (
+            {topData.map((entry, index) => (
               <Cell 
                 key={`cell-${index}`} 
                 fill={COLORS[index % COLORS.length]}
@@ -64,7 +69,7 @@ export default function DonutChartComponent({ data }: DonutChartComponentProps) 
             wrapperStyle={{
               paddingTop: '20px'
             }}
-            formatter={(value, entry, index) => (
+            formatter={(value) => (
               <span className="text-sm text-gray-600">
                 {value}
               </span>
