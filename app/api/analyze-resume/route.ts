@@ -103,6 +103,29 @@ function cleanGeminiResponse(raw: string): string {
   }
 }
 
+async function getValidGeminiResponse(prompt: string, maxRetries = 3): Promise<any> {
+  let retries = 0;
+  let lastError = null;
+
+  while (retries < maxRetries) {
+    try {
+      const { text: analysis } = await generateText({
+        model: google("gemini-1.5-pro"),
+        prompt: prompt,
+      });
+
+      const cleaned = cleanGeminiResponse(analysis);
+      return JSON.parse(cleaned);
+    } catch (error) {
+      lastError = error;
+      retries++;
+      if (retries < maxRetries) {
+        // Add a small delay before retrying
+        await new Promise(resolve => setTimeout(resolve, 500 * retries));
+      }
+    }
+  }
+}
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -126,14 +149,7 @@ export async function POST(request: Request) {
     }
 
     const prompt = buildGeminiPrompt(resumeText, jobDescription);
-    const { text: analysis } = await generateText({
-      model: google("gemini-1.5-pro"),
-      prompt: prompt,
-    });
-
-    const cleaned = cleanGeminiResponse(analysis);
-
-    const parsedAnalysis = JSON.parse(cleaned);
+    const parsedAnalysis = await getValidGeminiResponse(prompt);
 
     const resumeData = {
       userid,
