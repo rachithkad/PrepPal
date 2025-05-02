@@ -28,7 +28,7 @@ async function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section className="card-cta grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+      <section className="card-cta grid grid-cols-1 md:grid-cols-2 gap-10 items-center py-22">
         {/* Left Content */}
         <div className="flex flex-col gap-6 max-w-lg">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
