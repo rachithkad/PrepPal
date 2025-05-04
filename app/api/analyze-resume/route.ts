@@ -58,7 +58,10 @@ Format your response as valid JSON:
   "weaknesses": string[],
   "suggestions": string[],
   "jobRole": string[]
-}`;
+}
+  
+Return only the valid JSON make sure the response is a valid JSON before returning it.
+`;
 }
 
 
