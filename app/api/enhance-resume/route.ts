@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/firebase/admin";
 import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
+import { Logger } from "@/lib/logger";
 
 interface ResumeAnalysis {
   strengths?: string[];
@@ -104,21 +105,32 @@ Return ONLY the enhanced resume content in proper formatting (don't include anal
 
 export async function POST(request: Request) {
   let resumeId: string | undefined;
+  const startTime = Date.now();
 
   try {
+    Logger.info('Starting resume enhancement request');
+    
     const requestData = await request.json();
     resumeId = requestData.resumeId;
     
+    Logger.info('Received request data', {
+      resumeId,
+      requestDataKeys: Object.keys(requestData)
+    });
+
     if (!resumeId) {
+      Logger.error('Missing resume ID in request');
       return NextResponse.json(
         { success: false, error: "Missing resume ID." }, 
         { status: 400 }
       );
     }
 
+    Logger.info('Fetching resume from Firestore', { resumeId });
     const resumeDoc = await db.collection("resumes").doc(resumeId).get();
 
     if (!resumeDoc.exists) {
+      Logger.error('Resume not found in Firestore', { resumeId });
       return NextResponse.json(
         { success: false, error: "Resume not found." },
         { status: 404 }
@@ -126,10 +138,16 @@ export async function POST(request: Request) {
     }
 
     const resumeData = resumeDoc.data() as ResumeData;
+    Logger.info('Retrieved resume data', {
+      resumeId,
+      hasOldResume: !!resumeData.oldResumeText,
+      hasAnalysis: !!resumeData.analysis,
+      hasJobDescription: !!resumeData.jobDescription
+    });
 
     // Check for existing enhanced resume first
     if (resumeData?.enhancedResumeText) {
-      console.log("Returning Existing Resume");
+      Logger.info('Returning cached enhanced resume', { resumeId });
       return NextResponse.json(
         { 
           success: true, 
@@ -142,6 +160,13 @@ export async function POST(request: Request) {
 
     // Validate required data
     if (!resumeData?.oldResumeText || !resumeData?.analysis) {
+      Logger.error('Incomplete resume data in database', {
+        resumeId,
+        missingFields: [
+          !resumeData.oldResumeText ? 'oldResumeText' : '',
+          !resumeData.analysis ? 'analysis' : ''
+        ].filter(Boolean)
+      });
       return NextResponse.json(
         { success: false, error: "Incomplete resume data in database." },
         { status: 400 }
@@ -149,12 +174,18 @@ export async function POST(request: Request) {
     }
 
     // Generate enhanced resume
+    Logger.info('Building enhancement prompt', { resumeId });
     const prompt = buildEnhancementPrompt(
       resumeData.oldResumeText, 
       resumeData.analysis, 
       resumeData.jobDescription
     );
 
+    Logger.info('Generating enhanced resume text with Gemini', {
+      resumeId,
+      promptLength: prompt.length
+    });
+    
     const { text: enhancedResume } = await generateText({
       model: google("gemini-1.5-pro-latest"),
       prompt: prompt,
@@ -162,12 +193,23 @@ export async function POST(request: Request) {
       temperature: 0.2,
     });
 
+    Logger.info('Successfully generated enhanced resume', {
+      resumeId,
+      enhancedResumeLength: enhancedResume.length
+    });
+
+    Logger.info('Generating HTML version of resume', { resumeId });
     const htmlPrompt = resumeToHTML(enhancedResume);
     const { text: htmlResume } = await generateText({
       model: google("gemini-1.5-pro-latest"),
       prompt: htmlPrompt,
       maxTokens: 3000,
       temperature: 0.2,
+    });
+
+    Logger.info('Successfully generated HTML resume', {
+      resumeId,
+      htmlResumeLength: htmlResume.length
     });
 
     // Save to Firestore
@@ -178,7 +220,13 @@ export async function POST(request: Request) {
       htmlResume: htmlResume,
     };
 
+    Logger.info('Updating Firestore with enhanced resume', { resumeId });
     await db.collection("resumes").doc(resumeId).update(updateData);
+
+    Logger.info('Successfully completed resume enhancement', {
+      resumeId,
+      durationMs: Date.now() - startTime
+    });
 
     return NextResponse.json(
       { success: true, enhancedResume },
@@ -186,17 +234,28 @@ export async function POST(request: Request) {
     );
 
   } catch (error) {
-    if (resumeId && error instanceof Error && error.message.includes("resumeId")) {
-    
+    Logger.error('Error during resume enhancement', {
+      resumeId,
+      error: error instanceof Error ? {
+        message: error.message,
+        stack: error.stack
+      } : 'Unknown error',
+      durationMs: Date.now() - startTime
+    });
+
     // Update Firestore with failure status if we have the resumeId
-    if (error instanceof Error && error.message.includes("resumeId")) {
+    if (resumeId) {
       try {
+        Logger.info('Recording enhancement failure in Firestore', { resumeId });
         await db.collection("resumes").doc(resumeId).update({
           enhancementFailed: true,
           enhancedAt: new Date().toISOString(),
         });
       } catch (dbError) {
-        console.error("Failed to update failure status:", dbError);
+        Logger.error('Failed to update failure status in Firestore', {
+          resumeId,
+          error: dbError instanceof Error ? dbError.message : 'Unknown error'
+        });
       }
     }
 
@@ -208,10 +267,11 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-  }
 }
 
+
 export async function GET() {
+  Logger.info('Health check endpoint called');
   return NextResponse.json(
     { success: true, message: "Resume enhancement service is operational" },
     { status: 200 }

@@ -2,19 +2,38 @@ import { generateText } from "ai";
 import { google } from "@ai-sdk/google";
 import { getRandomInterviewCover } from "@/lib/utils";
 import { db } from "@/firebase/admin";
+import { Logger } from "@/lib/logger";
 
 export async function POST(request: Request) {
-  const { resumeText, userid, jobDescription } = await request.json();
-
-  if (!resumeText || !userid) {
-    return Response.json({ success: false, error: "Missing resume text or user ID" }, { status: 400 });
-  }
+  const startTime = Date.now();
+  Logger.info('Starting interview questions generation request');
 
   try {
+    const requestData = await request.json();
+    const { resumeText, userid, jobDescription } = requestData;
+
+    Logger.debug('Received request data', {
+      resumeTextLength: resumeText?.length,
+      userid,
+      jobDescriptionLength: jobDescription?.length
+    });
+
+    if (!resumeText || !userid) {
+      Logger.error('Missing required fields', {
+        missingFields: [
+          !resumeText ? 'resumeText' : '',
+          !userid ? 'userid' : ''
+        ].filter(Boolean)
+      });
+      return Response.json(
+        { success: false, error: "Missing resume text or user ID" }, 
+        { status: 400 }
+      );
+    }
+
     // Step 1: Extract info from resume
-    const { text: extracted } = await generateText({
-      model: google("gemini-1.5-pro"),
-      prompt: `Extract the following information from the resume text below:
+    Logger.info('Extracting information from resume');
+    const extractPrompt = `Extract the following information from the resume text below:
 - Job Role or Title
 - Experience Level (e.g., Intern, Junior, Mid-Level, Senior, Lead, etc.)
 - Relevant Tech Stack (comma-separated list of tools, languages, or frameworks)
@@ -38,7 +57,15 @@ Return the result as valid JSON:
   "company": "string"
 }
 
-DO NOT include any extra text or formatting.`,
+DO NOT include any extra text or formatting.`; 
+
+    const { text: extracted } = await generateText({
+      model: google("gemini-1.5-pro"),
+      prompt: extractPrompt,
+    });
+
+    Logger.debug('Received extraction response', {
+      responseLength: extracted.length
     });
 
     const cleaned = extracted
@@ -46,7 +73,19 @@ DO NOT include any extra text or formatting.`,
       .replace(/^```/gm, "")
       .trim();
 
-    const parsed = JSON.parse(cleaned);
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+      Logger.info('Successfully parsed extracted information', {
+        extractedData: parsed
+      });
+    } catch (parseError) {
+      Logger.error('Failed to parse extracted information', {
+        error: parseError instanceof Error ? parseError.message : 'Unknown error',
+        cleanedResponse: cleaned
+      });
+      throw new Error("Failed to parse extracted information");
+    }
 
     const role = parsed.role || "Software Engineer";
     const level = parsed.level || "Mid-Level";
@@ -55,7 +94,17 @@ DO NOT include any extra text or formatting.`,
     const type = "Mixed";
     const amount = 4;
 
-    // Step 2: Generate questions using resume and optional job description
+    Logger.info('Determined interview parameters', {
+      role,
+      level,
+      techstack,
+      company,
+      type,
+      amount
+    });
+
+    // Step 2: Generate questions
+    Logger.info('Generating interview questions');
     const questionPrompt = jobDescription 
       ? `Prepare questions for a job interview based on both the candidate's resume and the job description.
         The job role is ${role}.
@@ -96,13 +145,31 @@ DO NOT include any extra text or formatting.`,
       prompt: questionPrompt,
     });
 
+    Logger.debug('Received questions response', {
+      responseLength: questions.length
+    });
+
+    let parsedQuestions;
+    try {
+      parsedQuestions = JSON.parse(questions);
+      Logger.info('Successfully parsed generated questions', {
+        questionCount: parsedQuestions.length
+      });
+    } catch (parseError) {
+      Logger.error('Failed to parse generated questions', {
+        error: parseError instanceof Error ? parseError.message : 'Unknown error',
+        questionsResponse: questions
+      });
+      throw new Error("Failed to parse generated questions");
+    }
+
     // Step 3: Store in Firestore
     const interview = {
       role,
       type,
       level,
       techstack: techstack.split(",").map((t: string) => t.trim()),
-      questions: JSON.parse(questions),
+      questions: parsedQuestions,
       userId: userid,
       company,
       finalized: true,
@@ -111,7 +178,13 @@ DO NOT include any extra text or formatting.`,
       ...(jobDescription && { jobDescription }), 
     };
 
+    Logger.info('Saving interview to Firestore');
     await db.collection("interviews").add(interview);
+    Logger.info('Successfully saved interview data');
+
+    Logger.info('Successfully completed interview generation', {
+      durationMs: Date.now() - startTime
+    });
 
     return Response.json({ 
       success: true, 
@@ -124,11 +197,31 @@ DO NOT include any extra text or formatting.`,
     }, { status: 200 });
 
   } catch (error) {
-    console.error("Error processing resume:", error);
-    return Response.json({ success: false, error: error?.toString() || "Unknown error" }, { status: 500 });
+    Logger.error('Error processing interview generation', {
+      error: error instanceof Error ? {
+        message: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      } : 'Unknown error',
+      durationMs: Date.now() - startTime
+    });
+
+    return Response.json(
+      { 
+        success: false, 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      }, 
+      { status: 500 }
+    );
   }
 }
 
 export async function GET() {
-  return Response.json({ success: true, data: "Resume processing service is operational" }, { status: 200 });
+  Logger.info('Health check endpoint called');
+  return Response.json(
+    { 
+      success: true, 
+      data: "Resume processing service is operational" 
+    }, 
+    { status: 200 }
+  );
 }

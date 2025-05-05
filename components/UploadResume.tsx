@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { UploadCloud, FileText, ArrowRight } from "lucide-react";
+import { UploadCloud, FileText, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import * as mammoth from "mammoth";
@@ -185,13 +185,25 @@ const ResumeUploadPage = () => {
 
         {/* Generate Interview Button */}
         <Button
-          onClick={handleGenerateInterview}
-          disabled={loading || !parsedText}
-          className="mb-4 w-full"
-        >
-          {loading ? "Generating Interview..." : "Generate Interview"}
-        </Button>
-
+            onClick={handleGenerateInterview}
+            disabled={loading || !parsedText}
+            className={`mb-4 w-full bg-emerald-600 text-white font-medium rounded-lg
+              ${loading || !parsedText 
+                ? 'opacity-50 cursor-not-allowed' 
+                : 'hover:bg-emerald-700 active:animate-pulse'}
+              transition-all duration-200 py-6 text-lg shadow-emerald-200/50 hover:shadow-lg`}
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                Creating Your Interview...
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-1">
+                <Sparkles className="h-5 w-5" />
+                Generate Interview
+              </span>
+            )}
+          </Button>
         {loading && (
           <motion.div
             initial={{ opacity: 0 }}

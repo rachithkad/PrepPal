@@ -199,7 +199,7 @@ export default function ResumeAnalytics() {
               Mention the role you are aiming for or Paste Job Description
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              We'll tailor your results to this role.
+              We'll tailor your results to this role. Provide the Job description for a good cover letter generation.
             </p>
             <Textarea
               placeholder="Mention the role or paste the job description here..."
