@@ -239,7 +239,6 @@ export default function ResumeAnalytics() {
         open={modalOpen}
         onOpenChange={setModalOpen}
         action={executeAnalysis}
-        actionType="analysis"
         onSuccess={(result: { success: boolean; id?: string }) => {
           if (result.success && result.id) {
             handleSuccess(result.id);

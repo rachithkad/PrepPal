@@ -123,6 +123,7 @@ DO NOT include any extra text or formatting.`;
         1. Assess the candidate's fit based on their resume
         2. Evaluate their qualifications for the specific job requirements
         3. Cover both technical and behavioral aspects
+        4. Would be asked if the candidate were to interview for the ${role} role at the ${company} company/organisation
         
         Please return only the questions, without any additional text.
         The questions are going to be read by a voice assistant so do not use "/" or "*" or any other special characters which might break the voice assistant.
