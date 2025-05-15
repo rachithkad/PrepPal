@@ -122,15 +122,15 @@ const Feedback = ({ feedback, interview, paramID }: any) => {
 
                     {/* Interview Date Card (Smaller, Attached) */}
                     <motion.div
-                        key="interview-date"
-                        variants={cardVariants}
-                        className="absolute bottom-0 right-0 translate-x-12 translate-y-6"
+                    key="interview-date"
+                    variants={cardVariants}
+                    className="absolute bottom-0 right-0 md:translate-x-12 translate-x-4 translate-y-6 z-10"
                     >
-                        <Card className="bg-indigo-700 text-white border-indigo-600 rounded-md shadow-md">
-                            <CardContent className="px-3 text-center">
-                                <Calendar className="text-indigo-200 w-6 h-6 mx-auto mb-1" />
-                                <h3 className="text-sm font-semibold text-indigo-200 mb-0.5">Interview Date</h3>
-                                <p className="text-sm font-bold text-indigo-100">
+                        <Card className="bg-indigo-700 text-white border-indigo-600 rounded-md shadow-md w-[120px]">
+                            <CardContent className="px-2 py-2 text-center">
+                                <Calendar className="text-indigo-200 w-5 h-5 mx-auto mb-1" />
+                                <h3 className="text-xs font-semibold text-indigo-200 mb-0.5">Interview Date</h3>
+                                <p className="text-xs font-bold text-indigo-100">
                                     {dayjs(feedback?.createdAt).format("MMM D,YYYY") || "N/A"}
                                 </p>
                             </CardContent>
