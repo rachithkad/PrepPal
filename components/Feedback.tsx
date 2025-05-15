@@ -8,7 +8,7 @@ import {
     AlertTriangle, Calendar, ListChecks, ThumbsUp, Lightbulb, ArrowLeft, Repeat, Award
 } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
-import FadeIn from "./FadeIn"; // Import the FadeIn component
+import FadeIn from "./FadeIn"; 
 
 const cardVariants = {
     initial: { opacity: 0, y: 30 },
@@ -120,18 +120,31 @@ const Feedback = ({ feedback, interview, paramID }: any) => {
                         </Card>
                     </motion.div>
 
-                    {/* Interview Date Card (Smaller, Attached) */}
+                    {/* Interview Date Card */}
                     <motion.div
-                    key="interview-date"
-                    variants={cardVariants}
-                    className="absolute bottom-0 right-0 md:translate-x-12 translate-x-4 translate-y-6 z-10"
+                        key="interview-date"
+                        variants={cardVariants}
+                        className="
+                            absolute 
+                            bottom-0 
+                            left-1/2 
+                            -translate-x-1/2 
+                            md:left-auto 
+                            md:right-0 
+                            md:translate-x-12 
+                            w-[33.33%] 
+                            min-w-[100px] 
+                            max-w-[150px]
+                            md:translate-y-6 
+                            translate-y-[110%]
+                        "
                     >
-                        <Card className="bg-indigo-700 text-white border-indigo-600 rounded-md shadow-md w-[120px]">
-                            <CardContent className="px-2 py-2 text-center">
-                                <Calendar className="text-indigo-200 w-5 h-5 mx-auto mb-1" />
-                                <h3 className="text-xs font-semibold text-indigo-200 mb-0.5">Interview Date</h3>
-                                <p className="text-xs font-bold text-indigo-100">
-                                    {dayjs(feedback?.createdAt).format("MMM D,YYYY") || "N/A"}
+                        <Card className="bg-indigo-700 text-white border-indigo-600 rounded-md shadow-md p-0">
+                            <CardContent className="px-1 py-1 text-center">
+                                <Calendar className="text-indigo-200 w-4 h-4 mx-auto" />
+                                <h3 className="text-[10px] md:text-xs font-semibold text-indigo-200 leading-tight">Interview</h3>
+                                <p className="text-xs md:text-sm font-bold text-indigo-100 leading-none">
+                                    {dayjs(feedback?.createdAt).format("MMM D, YYYY") || "N/A"}
                                 </p>
                             </CardContent>
                         </Card>
